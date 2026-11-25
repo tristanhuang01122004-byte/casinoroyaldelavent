@@ -622,7 +622,7 @@ render();
 music.want = 'lounge';
 document.addEventListener('pointerdown', () => {
   unlockAudio();
-  if (sound.on && !music.cur) music.play(document.body.classList.contains('in-room') ? 'room' : 'lounge');
+  if (sound.on && !music.cur && !music.token) music.play(document.body.classList.contains('in-room') ? 'room' : 'lounge');
 }, true);
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
