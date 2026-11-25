@@ -4,103 +4,9 @@ import { CONFIG } from './config.js';
 import { vipCardHTML, RULES, rain } from './app.js';
 import { say } from './vibes.js';
 import { ornament } from './ornaments.js';
+import { openSlotRoom, SYMBOLS } from './slot.js';
 
 const $ = (s, r) => r.querySelector(s);
-
-/* ───────────── Machine à sous (réutilisable) ───────────── */
-const SYMBOLS = ['7', '♠', '♥', '♦', '♣'];
-const PAY = { seven: 10, triple: 6, pair: 2 };
-
-function slotOutcome(r) {
-  if (r[0] === r[1] && r[1] === r[2]) return r[0] === 0 ? { win: PAY.seven, kind: 'Jackpot 7 7 7' } : { win: PAY.triple, kind: 'Brelan' };
-  if (r[0] === r[1] || r[1] === r[2] || r[0] === r[2]) return { win: PAY.pair, kind: 'Paire' };
-  return { win: 0, kind: 'Rien' };
-}
-
-function symHTML(i) { return `<span class="sym ${i === 0 ? 'seven' : i === 2 || i === 3 ? 'red' : ''}">${SYMBOLS[i]}</span>`; }
-
-function slotMachine(el, { spinsTotal, label, api, onAllDone }) {
-  const d = api.data;
-  d.spins ||= [];
-  const last = d.spins[d.spins.length - 1];
-  el.innerHTML = `
-    <div class="slot">
-      <div class="slot-top">Tours gratuits</div>
-      <div class="reels">${[0, 1, 2].map((i) => `<div class="reel"><div class="strip">${symHTML(last ? last.r[i] : [0, 1, 2][i])}</div></div>`).join('')}</div>
-      <div class="slot-msg" aria-live="polite">${last ? resultText(last) : say('slotIdle')}</div>
-      <div class="spin-dots">${Array.from({ length: spinsTotal }, (_, i) => `<i class="${i < d.spins.length ? 'used' : ''}"></i>`).join('')}</div>
-    </div>
-    <button class="btn gold block spin"></button>
-    <details class="odds"><summary>Gains et probabilités</summary>
-      <table>
-        <tr><td>7 7 7</td><td>+${PAY.seven}</td><td>0,8 %</td></tr>
-        <tr><td>Brelan (3 symboles identiques)</td><td>+${PAY.triple}</td><td>3,2 %</td></tr>
-        <tr><td>Paire</td><td>+${PAY.pair}</td><td>48 %</td></tr>
-        <tr><td>Rien</td><td>0</td><td>48 %</td></tr>
-      </table>
-      <p>5 symboles par rouleau, chacun avec 1 chance sur 5. Tirage fait au moment où tu appuies.</p>
-    </details>`;
-
-  const btn = $('.spin', el);
-  const msg = $('.slot-msg', el);
-  const setBtn = () => {
-    const left = spinsTotal - d.spins.length;
-    if (left > 0) { btn.textContent = `Lancer · tour ${d.spins.length + 1}/${spinsTotal}`; btn.disabled = false; }
-    else {
-      const total = d.spins.reduce((a, s) => a + s.win, 0);
-      btn.textContent = 'Continuer';
-      btn.disabled = false;
-      btn.onclick = () => onAllDone(total);
-    }
-  };
-  setBtn();
-  btn.onclick = spinsTotal - d.spins.length > 0 ? spin : btn.onclick;
-
-  function spin() {
-    if (d.spins.length >= spinsTotal || btn.disabled) return;
-    btn.disabled = true;
-    // Le tirage est fait et enregistré AVANT l'animation.
-    const r = [api.randInt(5), api.randInt(5), api.randInt(5)];
-    const o = slotOutcome(r);
-    const res = { r, win: o.win, kind: o.kind };
-    d.spins.push(res);
-    d.started = true;
-    if (o.win) api.credit(o.win, `${label}, tour ${d.spins.length} : ${o.kind.toLowerCase()}`, api.n);
-    else api.save();
-    api.haptic(10);
-    msg.textContent = '…';
-    const reels = el.querySelectorAll('.reel');
-    const h = reels[0].offsetHeight;
-    reels.forEach((reel, i) => {
-      const strip = $('.strip', reel);
-      const n = 18 + i * 6;
-      const cur = strip.lastElementChild?.outerHTML || symHTML(0);
-      let html = cur;
-      for (let k = 0; k < n; k++) html += symHTML(api.randInt(5));
-      html += symHTML(r[i]);
-      strip.style.transition = 'none';
-      strip.style.transform = 'translateY(0)';
-      strip.innerHTML = html;
-      void strip.offsetHeight;
-      strip.style.transition = `transform ${900 + i * 450}ms cubic-bezier(.15,.85,.25,1.02)`;
-      strip.style.transform = `translateY(-${(n + 1) * h}px)`;
-    });
-    setTimeout(() => {
-      reels.forEach((reel, i) => { const s = $('.strip', reel); s.style.transition = 'none'; s.style.transform = 'none'; s.innerHTML = symHTML(r[i]); });
-      msg.innerHTML = resultText(res);
-      el.querySelectorAll('.spin-dots i').forEach((dot, i) => dot.classList.toggle('used', i < d.spins.length));
-      if (res.win) { api.haptic([25, 40, 25]); rain($('.slot', el), res.win >= 6 ? 22 : 8); el.querySelector('.slot').classList.add('win'); setTimeout(() => el.querySelector('.slot')?.classList.remove('win'), 1200); }
-      api.refresh();
-      setBtn();
-      if (d.spins.length < spinsTotal) btn.onclick = spin;
-    }, 900 + 2 * 450 + 120);
-  }
-}
-
-function resultText(s) {
-  s.msg ||= say(s.win === PAY.seven ? 'slotJackpot' : s.win === PAY.triple ? 'slotTriple' : s.win ? 'slotPair' : 'slotNothing');
-  return s.win ? `<b>${s.msg}</b> · +${s.win} jetons` : s.msg;
-}
 
 /* ───────────── Jour 1 : bienvenue ───────────── */
 const welcome = {
@@ -194,7 +100,31 @@ const welcome = {
       title: 'Trois tours gratuits',
       summary: (d) => `+${(d.spins || []).reduce((a, s) => a + s.win, 0)} jetons`,
       render(el, api) {
-        slotMachine(el, { spinsTotal: 3, label: 'Jour 1 : machine à sous', api, onAllDone: (total) => api.complete({ total }) });
+        const SPINS = 3;
+        const draw = () => {
+          const d = api.data;
+          d.spins ||= [];
+          const left = SPINS - d.spins.length;
+          const total = d.spins.reduce((a, x) => a + x.win, 0);
+          el.innerHTML = `
+            <div class="slot-teaser">
+              <div class="teaser-reels">${['7', '♥', '7'].map((x, i) => `<span class="${i !== 1 ? 'seven' : 'red'}">${x}</span>`).join('')}</div>
+              <p class="lead">${left === SPINS ? 'La maison t\'offre <b>3 tours</b> sur sa machine à sous.'
+                : left > 0 ? `Il te reste <b>${left} tour${left > 1 ? 's' : ''}</b>. Gains : +${total}.`
+                : `Tours terminés. Gains : <b>+${total} jetons</b>.`}</p>
+              ${d.spins.length ? `<ul class="teaser-log">${d.spins.map((x, i) => `<li>Tour ${i + 1} · ${x.r.map((k) => SYMBOLS[k]).join(' ')} · ${x.win ? '+' + x.win : '0'}</li>`).join('')}</ul>` : ''}
+              <p class="muted">Les probabilités s'affichent en direct pendant toute la partie.</p>
+            </div>
+            <button class="btn gold block go">${left === SPINS ? 'Entrer dans la salle des machines' : left > 0 ? 'Retourner à la machine' : 'Continuer'}</button>`;
+          el.querySelector('.go').onclick = () => {
+            if (left <= 0) return api.complete({ total });
+            openSlotRoom({ api, spinsTotal: SPINS, label: 'Jour 1 : machine à sous', onClose: (finished) => {
+              if (finished) api.complete({ total: api.data.spins.reduce((a, x) => a + x.win, 0) });
+              else draw();
+            } });
+          };
+        };
+        draw();
       },
     },
     {
@@ -228,4 +158,3 @@ export const GAMES = {
   welcome,
 };
 
-export { slotMachine };
