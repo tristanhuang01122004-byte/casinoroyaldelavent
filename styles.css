@@ -573,3 +573,8 @@ body.in-room { overflow: hidden; }
 @keyframes bnWobble { 50% { transform: translate(-50%, -50%) rotate(2deg) scale(1.05); } }
 .bn-res.bn-none { color: #c9d6cf; border-color: #5f6f67; box-shadow: none; transform: translate(-50%, -50%) rotate(2deg); }
 .bn-res.bn-none .bn-main { font-style: italic; letter-spacing: .02em; }
+
+/* Bouton musique */
+.hdr-right { display: flex; align-items: center; gap: 8px; }
+.snd { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--red); background: var(--table); color: var(--cream); font-size: 17px; line-height: 1; display: grid; place-items: center; padding: 0; }
+.snd.off { color: var(--cream-2); opacity: .55; text-decoration: line-through; }

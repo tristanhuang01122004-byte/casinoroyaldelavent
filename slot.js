@@ -1,6 +1,7 @@
 // La salle des machines : machine à sous plein écran, probabilités en direct,
 // suspense, étincelles et sons. Le tirage est fait et enregistré AVANT l'animation.
 import { say, VIBES } from './vibes.js';
+import { sound, tone, unlockAudio, setSound, music } from './audio.js';
 
 export const SYMBOLS = ['7', '♠', '♥', '♦', '♣'];
 export const PAY = { seven: 10, triple: 6, pair: 2, none: 0 };
@@ -32,53 +33,6 @@ const symCls = (i) => (i === 0 ? 'seven' : i === 2 || i === 3 ? 'red' : '');
 const cell = (i) => `<span class="cell ${symCls(i)}">${SYMBOLS[i]}</span>`;
 
 /* ───────────── Sons (Web Audio, sans fichier) ───────────── */
-let actx = null, master = null, htmlUnlock = null;
-const sound = { on: (() => { try { return localStorage.getItem('cra_sound') !== 'off'; } catch { return true; } })() };
-function ac() {
-  if (!actx) {
-    // iPhone : jouer même en mode silencieux (iOS 17+).
-    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
-    try {
-      actx = new (window.AudioContext || window.webkitAudioContext)();
-      master = actx.createGain();
-      master.gain.value = 1;
-      const comp = actx.createDynamicsCompressor();
-      master.connect(comp).connect(actx.destination);
-    } catch { return null; }
-  }
-  if (actx.state !== 'running') actx.resume?.();
-  return actx;
-}
-// À appeler pendant un appui : débloque l'audio sur tous les navigateurs.
-let unlocked = false;
-export function unlockAudio() {
-  if (unlocked) return;
-  const c = ac(); if (!c) return;
-  try {
-    const src = c.createBufferSource();
-    src.buffer = c.createBuffer(1, 1, 22050);
-    src.connect(c.destination);
-    src.start(0);
-    htmlUnlock ||= new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
-    htmlUnlock.play().catch(() => {});
-    unlocked = c.state === 'running';
-  } catch {}
-}
-function tone(freq, dur, { type = 'square', vol = 0.1, slide = 0, delay = 0 } = {}) {
-  if (!sound.on) return null;
-  const c = ac(); if (!c) return null;
-  const t = c.currentTime + delay + 0.01;
-  const o = c.createOscillator(), g = c.createGain();
-  o.type = type;
-  o.frequency.setValueAtTime(freq, t);
-  if (slide) o.frequency.exponentialRampToValueAtTime(freq * slide, t + dur);
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(vol, t + 0.008);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g).connect(master);
-  o.start(t); o.stop(t + dur + 0.05);
-  return o;
-}
 const sfx = {
   tick: () => tone(1400, 0.03, { vol: 0.06 }),
   stop: () => { tone(160, 0.18, { type: 'triangle', vol: 0.5, slide: 0.55 }); tone(1000, 0.05, { vol: 0.08 }); },
@@ -179,6 +133,8 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
   document.body.append(room);
   document.body.classList.add('in-room');
   requestAnimationFrame(() => room.classList.add('open'));
+  music.intensity(0.3);
+  music.play('room');
 
   const q = (s) => room.querySelector(s);
   const fx = sparks(q('.room-sparks'));
@@ -270,6 +226,7 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
     sfx.lever();
     api.haptic(20);
     room.classList.add('spinning');
+    music.intensity(0.7);
     room.classList.remove('won', 'big');
     win.classList.remove('hit', 'tense');
     q('.win-pop').className = 'win-pop';
@@ -338,6 +295,7 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
         msg.className = 'room-msg tense';
         msg.innerHTML = jackpotTense ? 'Deux 7… <b>Le jackpot est possible</b>' : `Deux ${SYMBOLS[r[0]]}… <b>un troisième ?</b>`;
         sfx.tension((durations[2] - durations[1]) / 1000);
+        music.intensity(1);
         setTimeout(() => whisper(VIBES.whispersTense), 600);
         api.haptic([10, 80, 10, 80, 10]);
         const wr = win.getBoundingClientRect();
@@ -351,9 +309,12 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
 
     function finish() {
       room.classList.remove('spinning', 'tension');
+      music.intensity(0.3);
       win.classList.remove('tense');
       KEYS.forEach((key) => q(`.live-row[data-k="${key}"]`).classList.add(key === k ? 'hit' : 'miss'));
-      res.msg ||= lines?.[k] ?? say(k === 'seven' ? 'slotJackpot' : k === 'triple' ? 'slotTriple' : k === 'pair' ? 'slotPair' : 'slotNothing');
+      let line = lines?.[k];
+      if (line && typeof line === 'object') { line = d.onceUsed ? line.then : line.once; d.onceUsed = true; }
+      res.msg ||= line ?? say(k === 'seven' ? 'slotJackpot' : k === 'triple' ? 'slotTriple' : k === 'pair' ? 'slotPair' : 'slotNothing');
       api.save();
       setTimeout(() => banner(res.msg, res.win ? `+${res.win} jetons` : '', `bn-res bn-${k}`, k === 'seven' ? 3000 : 2400), k === 'seven' || k === 'triple' ? 1500 : 1100);
       const pop = q('.win-pop');
@@ -425,6 +386,7 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
     if (closed) return;
     closed = true;
     removeEventListener('hashchange', onHash);
+    music.play('lounge');
     fx.destroy();
     room.classList.remove('open');
     document.body.classList.remove('in-room');
@@ -439,10 +401,10 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
   lever.onclick = () => { unlockAudio(); spin(); };
   q('.room-quit').onclick = () => { if (!spinning) close(); };
   q('.room-sound').onclick = (e) => {
-    sound.on = !sound.on;
-    try { localStorage.setItem('cra_sound', sound.on ? 'on' : 'off'); } catch {}
+    setSound(!sound.on);
     e.target.textContent = sound.on ? '♪ on' : '♪ off';
-    if (sound.on) { unlockAudio(); sfx.test(); api.haptic([30, 60, 30]); }
+    if (sound.on) { sfx.test(); api.haptic([30, 60, 30]); }
+    document.querySelector('#snd')?.classList.toggle('off', !sound.on);
   };
   if (d.spins.length >= spinsTotal) showEnd();
 }

@@ -3,6 +3,7 @@ import { GAMES } from './games.js';
 import { say } from './vibes.js';
 import { startFx, burst } from './fx.js';
 import { ornament, laurel } from './ornaments.js';
+import { sound, unlockAudio, setSound, music } from './audio.js';
 
 /* ───────────── Sauvegarde ───────────── */
 const KEY_REAL = 'cra_save_v1';
@@ -147,13 +148,17 @@ function renderHeader() {
         <span class="logo-suit">${ornament(24)}</span>
         <span class="logo-txt">Casino Royal<small>de l'Avent</small></span>
       </button>
+      <div class="hdr-right">
+      <button class="snd ${sound.on ? '' : 'off'}" id="snd" aria-label="Musique">♪</button>
       <a class="bal-pill" href="#/releve" aria-label="Solde et relevé">
         <span class="chip-ico" aria-hidden="true"></span>
         <span id="hdr-bal">${S.balance.toLocaleString('fr-FR')}</span>
       </a>
+      </div>
     </div>`;
   shownBalance = S.balance;
   $('#logo').onclick = onLogoTap;
+  $('#snd').onclick = () => { setSound(!sound.on); $('#snd').classList.toggle('off', !sound.on); if (sound.on) music.play(document.body.classList.contains('in-room') ? 'room' : 'lounge'); };
   $('#t-menu')?.addEventListener('click', adminMenu);
 }
 
@@ -612,6 +617,13 @@ export function rain(anchor, count = 14) {
 window.addEventListener('hashchange', render);
 startFx();
 render();
+
+// La musique démarre au premier appui (les navigateurs l'exigent).
+music.want = 'lounge';
+document.addEventListener('pointerdown', () => {
+  unlockAudio();
+  if (sound.on && !music.cur) music.play(document.body.classList.contains('in-room') ? 'room' : 'lounge');
+}, true);
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   const hadController = !!navigator.serviceWorker.controller;

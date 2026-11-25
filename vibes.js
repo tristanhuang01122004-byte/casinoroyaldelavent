@@ -21,7 +21,7 @@ export const VIBES = {
 
   // ── Salle des machines ──
   // Un seul petit mot par tirage, affiché en petit à côté de la machine.
-  whispers: ['presque…', 'allez…', 'ça sent bon', 'on y croit', 'patience…', 'doucement…', 'hmm…', 'la maison transpire', 'boomboclat'],
+  whispers: ['presque…', 'allez…', 'ça sent bon', 'on y croit', 'patience…', 'doucement…', 'hmm…', 'la maison transpire'],
   // Quand les deux premiers rouleaux sont identiques
   whispersTense: ['presque…', 'encore un…', 'retiens ton souffle', 'allez allez…'],
 };
@@ -29,10 +29,11 @@ export const VIBES = {
 // Phrases de résultat de la machine à sous, par jour.
 export const SLOT_LINES = {
   1: {
-    seven: 'Boomboclat wallah !!',
-    triple: 'Boomboclat wallah !!',
+    // { once, then } : « once » ne sort qu'une seule fois sur les 3 tirages.
+    seven: { once: 'Boomboclat wallah !!', then: 'Bouzelouf wallah !!' },
+    triple: { once: 'Boomboclat wallah !!', then: 'Bouzelouf wallah !!' },
     pair: 'Mais nan ! Bouzelouf wallah',
-    none: 'Boomboclat…',
+    none: { once: 'Boomboclat…', then: 'Bouzelouf…' },
   },
 };
 
