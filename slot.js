@@ -189,6 +189,26 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
   let spinning = false;
   let closed = false;
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  // Bannière de résultat, sous la machine, après le reveal.
+  const chars = (t) => {
+    let i = 0;
+    const step = t.length > 16 ? 28 : 45;
+    const words = t.split(' ').map((w) => `<span class="w">${[...w].map((c) => `<span class="ch" style="--d:${(i++) * step}ms">${c}</span>`).join('')}</span>`);
+    return `<span class="${t.length > 16 ? 'long' : ''}">${words.join(' ')}</span>`;
+  };
+  function banner(text, sub, cls, dur) {
+    if (closed) return;
+    room.querySelectorAll('.bn').forEach((b) => b.remove());
+    const r = msg.getBoundingClientRect();
+    const b = document.createElement('div');
+    b.className = `bn ${cls}`;
+    b.style.setProperty('--y', `${r.top + r.height / 2}px`);
+    b.innerHTML = `<div class="bn-main">${chars(text)}</div>${sub ? `<div class="bn-sub">${sub}</div>` : ''}`;
+    room.append(b);
+    setTimeout(() => b.classList.add('out'), dur);
+    setTimeout(() => b.remove(), dur + 500);
+  }
+
   // Un seul petit mot par tirage, sur le côté de la machine.
   let side = 0;
   function whisper(list) {
@@ -260,8 +280,9 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
     const tense = r[0] === r[1];
     const jackpotTense = tense && r[0] === 0;
     // Durées d'arrêt de chaque rouleau (ms) et durée du freinage final.
-    const durations = [3200, 5600, tense ? (jackpotTense ? 10000 : 9200) : 8000];
-    const brake = [900, 1000, tense ? 2600 : 1300];
+    // Environ 3 s entre deux rouleaux ; le dernier traîne plus en cas de suspense.
+    const durations = [3000, 6000, tense ? (jackpotTense ? 11000 : 10000) : 9000];
+    const brake = [1000, 1200, tense ? 3000 : 1400];
     if (!tense) setTimeout(() => whisper(VIBES.whispers), durations[0] + 500);
     const H = reels[0].el.offsetHeight / 3;
     const plan = reels.map((R, i) => {
@@ -334,6 +355,7 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
       KEYS.forEach((key) => q(`.live-row[data-k="${key}"]`).classList.add(key === k ? 'hit' : 'miss'));
       res.msg ||= lines?.[k] ?? say(k === 'seven' ? 'slotJackpot' : k === 'triple' ? 'slotTriple' : k === 'pair' ? 'slotPair' : 'slotNothing');
       api.save();
+      setTimeout(() => banner(res.msg, res.win ? `+${res.win} jetons` : '', `bn-res bn-${k}`, k === 'seven' ? 3000 : 2400), k === 'seven' || k === 'triple' ? 1500 : 1100);
       const pop = q('.win-pop');
       const wr = win.getBoundingClientRect();
       const cx = wr.left + wr.width / 2, cy = wr.top + wr.height / 2;
