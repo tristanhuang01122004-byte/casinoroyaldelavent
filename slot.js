@@ -32,34 +32,61 @@ const symCls = (i) => (i === 0 ? 'seven' : i === 2 || i === 3 ? 'red' : '');
 const cell = (i) => `<span class="cell ${symCls(i)}">${SYMBOLS[i]}</span>`;
 
 /* ───────────── Sons (Web Audio, sans fichier) ───────────── */
-let actx = null;
+let actx = null, master = null, htmlUnlock = null;
 const sound = { on: (() => { try { return localStorage.getItem('cra_sound') !== 'off'; } catch { return true; } })() };
 function ac() {
-  if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch { return null; } }
-  if (actx.state === 'suspended') actx.resume();
+  if (!actx) {
+    // iPhone : jouer même en mode silencieux (iOS 17+).
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
+    try {
+      actx = new (window.AudioContext || window.webkitAudioContext)();
+      master = actx.createGain();
+      master.gain.value = 1;
+      const comp = actx.createDynamicsCompressor();
+      master.connect(comp).connect(actx.destination);
+    } catch { return null; }
+  }
+  if (actx.state !== 'running') actx.resume?.();
   return actx;
 }
-function tone(freq, dur, { type = 'square', vol = 0.04, slide = 0, delay = 0 } = {}) {
+// À appeler pendant un appui : débloque l'audio sur tous les navigateurs.
+let unlocked = false;
+export function unlockAudio() {
+  if (unlocked) return;
+  const c = ac(); if (!c) return;
+  try {
+    const src = c.createBufferSource();
+    src.buffer = c.createBuffer(1, 1, 22050);
+    src.connect(c.destination);
+    src.start(0);
+    htmlUnlock ||= new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+    htmlUnlock.play().catch(() => {});
+    unlocked = c.state === 'running';
+  } catch {}
+}
+function tone(freq, dur, { type = 'square', vol = 0.1, slide = 0, delay = 0 } = {}) {
   if (!sound.on) return null;
   const c = ac(); if (!c) return null;
-  const t = c.currentTime + delay;
+  const t = c.currentTime + delay + 0.01;
   const o = c.createOscillator(), g = c.createGain();
   o.type = type;
   o.frequency.setValueAtTime(freq, t);
   if (slide) o.frequency.exponentialRampToValueAtTime(freq * slide, t + dur);
-  g.gain.setValueAtTime(vol, t);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.008);
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g).connect(c.destination);
+  o.connect(g).connect(master);
   o.start(t); o.stop(t + dur + 0.05);
   return o;
 }
 const sfx = {
-  tick: () => tone(1500, 0.025, { vol: 0.015 }),
-  stop: () => { tone(150, 0.14, { type: 'triangle', vol: 0.14, slide: 0.6 }); tone(900, 0.04, { vol: 0.02 }); },
-  lever: () => tone(90, 0.25, { type: 'sawtooth', vol: 0.05, slide: 2.2 }),
-  tension: (d) => tone(180, d, { type: 'sawtooth', vol: 0.03, slide: 4 }),
-  win: (big) => (big ? [523, 659, 784, 1046, 784, 1046, 1318] : [659, 784, 1046]).forEach((f, i) => tone(f, 0.18, { type: 'square', vol: 0.05, delay: i * 0.09 })),
-  lose: () => tone(320, 0.4, { type: 'triangle', vol: 0.07, slide: 0.5 }),
+  tick: () => tone(1400, 0.03, { vol: 0.06 }),
+  stop: () => { tone(160, 0.18, { type: 'triangle', vol: 0.5, slide: 0.55 }); tone(1000, 0.05, { vol: 0.08 }); },
+  lever: () => tone(90, 0.3, { type: 'sawtooth', vol: 0.18, slide: 2.4 }),
+  tension: (d) => tone(170, d, { type: 'sawtooth', vol: 0.1, slide: 4 }),
+  win: (big) => (big ? [523, 659, 784, 1046, 784, 1046, 1318] : [659, 784, 1046]).forEach((f, i) => tone(f, 0.2, { type: 'square', vol: 0.16, delay: i * 0.09 })),
+  lose: () => tone(330, 0.45, { type: 'triangle', vol: 0.3, slide: 0.5 }),
+  test: () => [784, 1046].forEach((f, i) => tone(f, 0.15, { type: 'square', vol: 0.14, delay: i * 0.1 })),
 };
 
 /* ───────────── Étincelles (canvas) ───────────── */
@@ -162,28 +189,6 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
   let spinning = false;
   let closed = false;
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
-  const msgY = () => { const r = msg.getBoundingClientRect(); return r.top + r.height / 2; };
-  // Une lettre = un <span> animé ; les mots restent groupés pour pouvoir passer à la ligne.
-  const chars = (t) => {
-    let i = 0;
-    const step = t.length > 16 ? 28 : 45;
-    const words = t.split(' ').map((w) => `<span class="w">${[...w].map((c) => `<span class="ch" style="--d:${(i++) * step}ms;--x:${((Math.random() - 0.5) * 80).toFixed(0)}px;--r:${((Math.random() - 0.5) * 120).toFixed(0)}deg">${c}</span>`).join('')}</span>`);
-    return `<span class="${t.length > 16 ? 'long' : ''}">${words.join(' ')}</span>`;
-  };
-
-  // Bannière qui traverse l'écran.
-  function banner(html, cls, dur = 2000) {
-    if (closed) return;
-    room.querySelectorAll('.bn').forEach((b) => b.remove());
-    const b = document.createElement('div');
-    b.className = `bn ${cls}`;
-    b.style.setProperty('--y', `${msgY()}px`);
-    b.innerHTML = html;
-    room.append(b);
-    setTimeout(() => b.classList.add('out'), dur);
-    setTimeout(() => b.remove(), dur + 500);
-    return b;
-  }
   // Un seul petit mot par tirage, sur le côté de la machine.
   let side = 0;
   function whisper(list) {
@@ -328,7 +333,6 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
       win.classList.remove('tense');
       KEYS.forEach((key) => q(`.live-row[data-k="${key}"]`).classList.add(key === k ? 'hit' : 'miss'));
       res.msg ||= lines?.[k] ?? say(k === 'seven' ? 'slotJackpot' : k === 'triple' ? 'slotTriple' : k === 'pair' ? 'slotPair' : 'slotNothing');
-      banner(`<div class="bn-main">${chars(res.msg)}</div>${res.win ? `<div class="bn-sub">+${res.win} jetons</div>` : ''}`, `bn-res bn-${k}`, k === 'seven' ? 2800 : 2200);
       api.save();
       const pop = q('.win-pop');
       const wr = win.getBoundingClientRect();
@@ -409,12 +413,14 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
   const onHash = () => close();
   addEventListener('hashchange', onHash);
 
-  lever.onclick = spin;
+  room.addEventListener('pointerdown', unlockAudio, true);
+  lever.onclick = () => { unlockAudio(); spin(); };
   q('.room-quit').onclick = () => { if (!spinning) close(); };
   q('.room-sound').onclick = (e) => {
     sound.on = !sound.on;
     try { localStorage.setItem('cra_sound', sound.on ? 'on' : 'off'); } catch {}
     e.target.textContent = sound.on ? '♪ on' : '♪ off';
+    if (sound.on) { unlockAudio(); sfx.test(); api.haptic([30, 60, 30]); }
   };
   if (d.spins.length >= spinsTotal) showEnd();
 }

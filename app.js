@@ -57,7 +57,30 @@ function weekKey() {
 /* ───────────── Petits outils UI ───────────── */
 const $ = (sel, root = document) => root.querySelector(sel);
 export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-export function haptic(p = 15) { try { navigator.vibrate?.(p); } catch {} }
+// Vibrations : Android via navigator.vibrate. iPhone (iOS 18+) n'a pas cette API :
+// on déclenche le retour haptique natif d'un interrupteur caché.
+let iosSwitch = null;
+function iosTap() {
+  if (!iosSwitch) {
+    iosSwitch = document.createElement('label');
+    iosSwitch.setAttribute('aria-hidden', 'true');
+    iosSwitch.style.cssText = 'position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden';
+    const i = document.createElement('input');
+    i.type = 'checkbox';
+    i.setAttribute('switch', '');
+    i.tabIndex = -1;
+    iosSwitch.append(i);
+    document.body.append(iosSwitch);
+  }
+  iosSwitch.click();
+}
+export function haptic(p = 15) {
+  try {
+    if (typeof navigator.vibrate === 'function') { navigator.vibrate(p); return; }
+    let t = 0;
+    (Array.isArray(p) ? p : [p]).forEach((d, i) => { if (i % 2 === 0) setTimeout(iosTap, t); t += d; });
+  } catch {}
+}
 
 export function toast(msg) {
   const t = document.createElement('div');
