@@ -18,6 +18,32 @@ export const VIBES = {
   slotTriple: ['BRELAN. Aura +1000', 'Brelan ! Insane'],
   slotJackpot: ['7 7 7 · JACKPOT · AURA INFINIE'],
   wrongCode: 'Code incorrect. Bien essayé',
+
+  // ── Salle des machines ──
+  // Fausses alertes : le grand titre s'affiche lettre par lettre, puis tombe
+  // et laisse place à la chute (twist).
+  teasers: [
+    { big: 'Jackpot', twist: '…pas encore, chef' },
+    { big: 'La maison perd', twist: 'nan je rigole' },
+    { big: 'Boomboclat', twist: 'on se calme, on se calme' },
+    { big: 'Aura +1000', twist: '(sous conditions)' },
+    { big: 'Bouzelouf', twist: 'wallah c\'est possible' },
+  ],
+  // Pendant le suspense (les deux premiers rouleaux sont identiques)
+  teaserJackpot: { big: 'Jackpot imminent', twist: 'ou pas. wallah on sait pas' },
+  teaserTriple: { big: 'Brelan en vue', twist: 'bouzelouf ? bouzelouf.' },
+  // Petits mots qui s'envolent pendant que ça tourne
+  floaters: ['wallah', 'boomboclat', 'bouzelouf', 'aura', 'la maison regarde', 'tiens bon', 'allez allez', '♠', '♥'],
+};
+
+// Phrases de résultat de la machine à sous, par jour.
+export const SLOT_LINES = {
+  1: {
+    seven: 'Boomboclat wallah !!',
+    triple: 'Boomboclat wallah !!',
+    pair: 'Mais nan ! Bouzelouf wallah',
+    none: 'Boomboclat…',
+  },
 };
 
 export const say = (k, ...args) => {

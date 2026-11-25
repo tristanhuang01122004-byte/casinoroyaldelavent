@@ -1,6 +1,6 @@
 // La salle des machines : machine à sous plein écran, probabilités en direct,
 // suspense, étincelles et sons. Le tirage est fait et enregistré AVANT l'animation.
-import { say } from './vibes.js';
+import { say, VIBES } from './vibes.js';
 
 export const SYMBOLS = ['7', '♠', '♥', '♦', '♣'];
 export const PAY = { seven: 10, triple: 6, pair: 2, none: 0 };
@@ -103,7 +103,7 @@ function sparks(canvas) {
 }
 
 /* ───────────── La salle ───────────── */
-export function openSlotRoom({ api, spinsTotal, label, onClose }) {
+export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
   const d = api.data;
   d.spins ||= [];
   const last = d.spins[d.spins.length - 1];
@@ -161,6 +161,49 @@ export function openSlotRoom({ api, spinsTotal, label, onClose }) {
   const win = q('.window');
   let spinning = false;
   let closed = false;
+  const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  const winY = () => { const r = win.getBoundingClientRect(); return r.top + r.height / 2; };
+  // Une lettre = un <span> animé ; les mots restent groupés pour pouvoir passer à la ligne.
+  const chars = (t) => {
+    let i = 0;
+    const step = t.length > 16 ? 28 : 45;
+    const words = t.split(' ').map((w) => `<span class="w">${[...w].map((c) => `<span class="ch" style="--d:${(i++) * step}ms;--x:${((Math.random() - 0.5) * 80).toFixed(0)}px;--r:${((Math.random() - 0.5) * 120).toFixed(0)}deg">${c}</span>`).join('')}</span>`);
+    return `<span class="${t.length > 16 ? 'long' : ''}">${words.join(' ')}</span>`;
+  };
+
+  // Bannière qui traverse l'écran.
+  function banner(html, cls, dur = 2000) {
+    if (closed) return;
+    room.querySelectorAll('.bn').forEach((b) => b.remove());
+    const b = document.createElement('div');
+    b.className = `bn ${cls}`;
+    b.style.setProperty('--y', `${winY()}px`);
+    b.innerHTML = html;
+    room.append(b);
+    setTimeout(() => b.classList.add('out'), dur);
+    setTimeout(() => b.remove(), dur + 500);
+    return b;
+  }
+  // Fausse alerte : le titre s'écrit, tombe, et la chute apparaît.
+  function teaser(t) {
+    const b = banner(`<div class="bn-main">${chars(t.big)}</div><div class="bn-sub">${t.twist}</div>`, 'bn-tease', 2150);
+    if (!b) return;
+    tone(880, 0.12, { type: 'triangle', vol: 0.04 });
+    setTimeout(() => { b.classList.add('crack'); tone(220, 0.25, { type: 'triangle', vol: 0.05, slide: 0.6 }); }, 950);
+  }
+  // Petits mots qui s'envolent.
+  let floatTimer = null;
+  function floater() {
+    if (closed) return;
+    const f = document.createElement('div');
+    f.className = 'fl';
+    f.textContent = pick(VIBES.floaters);
+    f.style.setProperty('--x', `${8 + Math.random() * 70}%`);
+    f.style.setProperty('--dx', `${((Math.random() - 0.5) * 120).toFixed(0)}px`);
+    f.style.setProperty('--r', `${((Math.random() - 0.5) * 16).toFixed(0)}deg`);
+    room.append(f);
+    setTimeout(() => f.remove(), 1900);
+  }
 
   const total = () => d.spins.reduce((a, s) => a + s.win, 0);
   function drawCounters() {
@@ -217,6 +260,8 @@ export function openSlotRoom({ api, spinsTotal, label, onClose }) {
 
     const tense = r[0] === r[1];
     const jackpotTense = tense && r[0] === 0;
+    if (!tense && (d.spins.length === 1 || Math.random() < 0.45)) setTimeout(() => teaser(pick(VIBES.teasers)), 150);
+    floatTimer = setInterval(floater, 420);
     const durations = [1150, 1850, tense ? (jackpotTense ? 5600 : 4300) : 2600];
     const H = reels[0].el.offsetHeight / 3;
     const plan = reels.map((R, i) => {
@@ -269,6 +314,7 @@ export function openSlotRoom({ api, spinsTotal, label, onClose }) {
         msg.className = 'room-msg tense';
         msg.innerHTML = jackpotTense ? 'Deux 7… <b>Le jackpot est possible</b>' : `Deux ${SYMBOLS[r[0]]}… <b>un troisième ?</b>`;
         sfx.tension((durations[2] - durations[1]) / 1000);
+        setTimeout(() => teaser(jackpotTense ? VIBES.teaserJackpot : VIBES.teaserTriple), 200);
         api.haptic([10, 80, 10, 80, 10]);
         const wr = win.getBoundingClientRect();
         tensionTimer = setInterval(() => {
@@ -280,10 +326,13 @@ export function openSlotRoom({ api, spinsTotal, label, onClose }) {
     }
 
     function finish() {
+      clearInterval(floatTimer);
+      room.querySelectorAll('.bn-tease').forEach((b) => b.remove());
       room.classList.remove('spinning', 'tension');
       win.classList.remove('tense');
       KEYS.forEach((key) => q(`.live-row[data-k="${key}"]`).classList.add(key === k ? 'hit' : 'miss'));
-      res.msg ||= say(k === 'seven' ? 'slotJackpot' : k === 'triple' ? 'slotTriple' : k === 'pair' ? 'slotPair' : 'slotNothing');
+      res.msg ||= lines?.[k] ?? say(k === 'seven' ? 'slotJackpot' : k === 'triple' ? 'slotTriple' : k === 'pair' ? 'slotPair' : 'slotNothing');
+      banner(`<div class="bn-main">${chars(res.msg)}</div>${res.win ? `<div class="bn-sub">+${res.win} jetons</div>` : ''}`, `bn-res bn-${k}`, k === 'seven' ? 2600 : 1900);
       api.save();
       const pop = q('.win-pop');
       const wr = win.getBoundingClientRect();
@@ -354,6 +403,7 @@ export function openSlotRoom({ api, spinsTotal, label, onClose }) {
     if (closed) return;
     closed = true;
     removeEventListener('hashchange', onHash);
+    clearInterval(floatTimer);
     fx.destroy();
     room.classList.remove('open');
     document.body.classList.remove('in-room');

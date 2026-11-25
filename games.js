@@ -2,7 +2,7 @@
 // Le jour 1 est un déroulé sur mesure : { steps() }.
 import { CONFIG } from './config.js';
 import { vipCardHTML, RULES, rain } from './app.js';
-import { say } from './vibes.js';
+import { say, SLOT_LINES } from './vibes.js';
 import { ornament } from './ornaments.js';
 import { openSlotRoom, SYMBOLS } from './slot.js';
 
@@ -118,7 +118,7 @@ const welcome = {
             <button class="btn gold block go">${left === SPINS ? 'Entrer dans la salle des machines' : left > 0 ? 'Retourner à la machine' : 'Continuer'}</button>`;
           el.querySelector('.go').onclick = () => {
             if (left <= 0) return api.complete({ total });
-            openSlotRoom({ api, spinsTotal: SPINS, label: 'Jour 1 : machine à sous', onClose: (finished) => {
+            openSlotRoom({ api, spinsTotal: SPINS, label: 'Jour 1 : machine à sous', lines: SLOT_LINES[1], onClose: (finished) => {
               if (finished) api.complete({ total: api.data.spins.reduce((a, x) => a + x.win, 0) });
               else draw();
             } });
