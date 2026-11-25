@@ -20,20 +20,10 @@ export const VIBES = {
   wrongCode: 'Code incorrect. Bien essayé',
 
   // ── Salle des machines ──
-  // Fausses alertes : le grand titre s'affiche lettre par lettre, puis tombe
-  // et laisse place à la chute (twist).
-  teasers: [
-    { big: 'Jackpot', twist: '…pas encore, chef' },
-    { big: 'La maison perd', twist: 'nan je rigole' },
-    { big: 'Boomboclat', twist: 'on se calme, on se calme' },
-    { big: 'Aura +1000', twist: '(sous conditions)' },
-    { big: 'Bouzelouf', twist: 'wallah c\'est possible' },
-  ],
-  // Pendant le suspense (les deux premiers rouleaux sont identiques)
-  teaserJackpot: { big: 'Jackpot imminent', twist: 'ou pas. wallah on sait pas' },
-  teaserTriple: { big: 'Brelan en vue', twist: 'bouzelouf ? bouzelouf.' },
-  // Petits mots qui s'envolent pendant que ça tourne
-  floaters: ['wallah', 'boomboclat', 'bouzelouf', 'aura', 'la maison regarde', 'tiens bon', 'allez allez', '♠', '♥'],
+  // Un seul petit mot par tirage, affiché en petit à côté de la machine.
+  whispers: ['presque…', 'allez…', 'ça sent bon', 'on y croit', 'patience…', 'doucement…', 'hmm…', 'la maison transpire', 'boomboclat'],
+  // Quand les deux premiers rouleaux sont identiques
+  whispersTense: ['presque…', 'encore un…', 'retiens ton souffle', 'allez allez…'],
 };
 
 // Phrases de résultat de la machine à sous, par jour.

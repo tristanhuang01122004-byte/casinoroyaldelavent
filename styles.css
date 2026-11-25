@@ -552,13 +552,6 @@ body.in-room { overflow: hidden; }
 @keyframes chIn { from { opacity: 0; transform: translateY(-14px) scale(1.6); } to { opacity: 1; transform: none; } }
 .bn-sub { font-family: var(--serif); font-style: italic; font-size: 20px; color: #fff4d6; line-height: 1.2; margin-top: 2px; }
 
-/* Fausse alerte : les lettres tombent, la chute apparaît */
-.bn-tease .bn-sub { opacity: 0; height: 0; }
-.bn-tease.crack .ch { animation: chFall .5s cubic-bezier(.5, 0, .9, .4) forwards; animation-delay: calc(var(--d) * .35); }
-@keyframes chFall { from { opacity: 1; transform: none; } to { opacity: 0; transform: translate(var(--x), 70px) rotate(var(--r)); } }
-.bn-tease.crack .bn-sub { height: auto; animation: subIn .45s .55s cubic-bezier(.2, 1.5, .4, 1) forwards; margin-top: -1.15em; font-size: 24px; }
-@keyframes subIn { from { opacity: 0; transform: translateY(10px) scale(.9); } to { opacity: 1; transform: none; } }
-
 /* Bannières de résultat */
 .bn-res.bn-seven, .bn-res.bn-triple { background: #f2c14e; color: #2a1a00; border-color: #070707; box-shadow: inset 0 3px 0 #f2c14e, inset 0 5px 0 #070707, inset 0 -3px 0 #f2c14e, inset 0 -5px 0 #070707; }
 .bn-res.bn-seven .bn-sub, .bn-res.bn-triple .bn-sub { color: #2a1a00; font-weight: 700; }
@@ -567,16 +560,20 @@ body.in-room { overflow: hidden; }
 .bn-res.bn-none { color: #c9d6cf; border-color: #5f6f67; box-shadow: none; transform: translate(-50%, -50%) rotate(2deg); }
 .bn-res.bn-none .bn-main { font-style: italic; letter-spacing: .02em; }
 
-.fl {
-  position: fixed; left: var(--x); bottom: 70px; z-index: 6; max-width: none !important; width: auto !important;
-  padding: 1px 10px; pointer-events: none; white-space: nowrap;
-  font-family: var(--serif); font-style: italic; font-size: 19px; color: #ffe39a;
-  border-top: 1px solid rgba(242, 193, 78, .7); border-bottom: 1px solid rgba(242, 193, 78, .7);
-  background: rgba(3, 20, 14, .55);
-  animation: flUp 1.9s cubic-bezier(.2, .7, .3, 1) forwards;
+/* Petit mot à côté de la machine (un par tirage) */
+.wh {
+  position: fixed; top: var(--y); z-index: 7; max-width: none !important; width: auto !important;
+  padding: 1px 10px 2px; pointer-events: none; white-space: nowrap;
+  font-family: var(--serif); font-style: italic; font-size: 17px; color: #ffe39a;
+  background: #03140e; border: 1px solid #f2c14e; border-radius: 4px;
+  animation: whIn .4s cubic-bezier(.2, 1.5, .4, 1) both;
 }
-@keyframes flUp {
-  0% { opacity: 0; transform: translateY(20px) scale(.7); }
-  15% { opacity: 1; transform: translateY(0) scale(1) rotate(var(--r)); }
-  100% { opacity: 0; transform: translate(var(--dx), -55vh) rotate(calc(var(--r) * -1)); }
-}
+.wh.right { right: 14px; transform: translateY(-60%) rotate(4deg); }
+.wh.left { left: 14px; transform: translateY(-60%) rotate(-4deg); }
+.wh.out { animation: whOut .45s ease-in forwards; }
+@keyframes whIn { from { opacity: 0; margin-top: 12px; } }
+@keyframes whOut { to { opacity: 0; margin-top: -14px; } }
+
+.bn-res { padding: 6px 22px 8px; }
+.bn-res .bn-main { font-size: clamp(21px, 6.4vw, 28px); }
+.bn-res .bn-sub { font-size: 17px; }

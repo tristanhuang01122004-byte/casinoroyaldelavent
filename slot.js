@@ -162,7 +162,7 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
   let spinning = false;
   let closed = false;
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
-  const winY = () => { const r = win.getBoundingClientRect(); return r.top + r.height / 2; };
+  const msgY = () => { const r = msg.getBoundingClientRect(); return r.top + r.height / 2; };
   // Une lettre = un <span> animé ; les mots restent groupés pour pouvoir passer à la ligne.
   const chars = (t) => {
     let i = 0;
@@ -177,32 +177,26 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
     room.querySelectorAll('.bn').forEach((b) => b.remove());
     const b = document.createElement('div');
     b.className = `bn ${cls}`;
-    b.style.setProperty('--y', `${winY()}px`);
+    b.style.setProperty('--y', `${msgY()}px`);
     b.innerHTML = html;
     room.append(b);
     setTimeout(() => b.classList.add('out'), dur);
     setTimeout(() => b.remove(), dur + 500);
     return b;
   }
-  // Fausse alerte : le titre s'écrit, tombe, et la chute apparaît.
-  function teaser(t) {
-    const b = banner(`<div class="bn-main">${chars(t.big)}</div><div class="bn-sub">${t.twist}</div>`, 'bn-tease', 2150);
-    if (!b) return;
-    tone(880, 0.12, { type: 'triangle', vol: 0.04 });
-    setTimeout(() => { b.classList.add('crack'); tone(220, 0.25, { type: 'triangle', vol: 0.05, slide: 0.6 }); }, 950);
-  }
-  // Petits mots qui s'envolent.
-  let floatTimer = null;
-  function floater() {
+  // Un seul petit mot par tirage, sur le côté de la machine.
+  let side = 0;
+  function whisper(list) {
     if (closed) return;
-    const f = document.createElement('div');
-    f.className = 'fl';
-    f.textContent = pick(VIBES.floaters);
-    f.style.setProperty('--x', `${8 + Math.random() * 70}%`);
-    f.style.setProperty('--dx', `${((Math.random() - 0.5) * 120).toFixed(0)}px`);
-    f.style.setProperty('--r', `${((Math.random() - 0.5) * 16).toFixed(0)}deg`);
-    room.append(f);
-    setTimeout(() => f.remove(), 1900);
+    room.querySelectorAll('.wh').forEach((w) => w.remove());
+    const r = win.getBoundingClientRect();
+    const w = document.createElement('div');
+    w.className = `wh ${side++ % 2 ? 'left' : 'right'}`;
+    w.textContent = pick(list);
+    w.style.setProperty('--y', `${r.top - 4}px`);
+    room.append(w);
+    setTimeout(() => w.classList.add('out'), 2200);
+    setTimeout(() => w.remove(), 2700);
   }
 
   const total = () => d.spins.reduce((a, s) => a + s.win, 0);
@@ -260,12 +254,13 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
 
     const tense = r[0] === r[1];
     const jackpotTense = tense && r[0] === 0;
-    if (!tense && (d.spins.length === 1 || Math.random() < 0.45)) setTimeout(() => teaser(pick(VIBES.teasers)), 150);
-    floatTimer = setInterval(floater, 420);
-    const durations = [1150, 1850, tense ? (jackpotTense ? 5600 : 4300) : 2600];
+    // Durées d'arrêt de chaque rouleau (ms) et durée du freinage final.
+    const durations = [3200, 5600, tense ? (jackpotTense ? 10000 : 9200) : 8000];
+    const brake = [900, 1000, tense ? 2600 : 1300];
+    if (!tense) setTimeout(() => whisper(VIBES.whispers), durations[0] + 500);
     const H = reels[0].el.offsetHeight / 3;
     const plan = reels.map((R, i) => {
-      const count = Math.round((durations[i] / 1000) * 15) + i * 3;
+      const count = Math.round(((durations[i] - brake[i] / 2) / 1000) * 17);
       let html = vis[i].map(cell).join('');
       for (let j = 0; j < count; j++) html += cell(api.randInt(5));
       const tgt = [(r[i] + 1 + api.randInt(4)) % 5, r[i], (r[i] + 1 + api.randInt(4)) % 5];
@@ -284,9 +279,12 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
       if (closed) return;
       reels.forEach((R, i) => {
         if (done[i]) return;
-        const p = Math.min(1, (now - t0) / durations[i]);
-        const e = 1 - Math.pow(1 - p, i === 2 && tense ? 4 : 3);
-        const off = plan[i].final * e;
+        // Vitesse constante, puis freinage sur les dernières secondes.
+        const t = Math.min(durations[i], now - t0);
+        const p = t / durations[i];
+        const v = plan[i].final / (durations[i] - brake[i] / 2);
+        const td = durations[i] - brake[i];
+        const off = t <= td ? v * t : v * td + v * (t - td) - (v * (t - td) ** 2) / (2 * brake[i]);
         R.strip.style.transform = `translateY(${-off}px)`;
         const idx = Math.floor(off / H);
         if (idx !== plan[i].lastIdx) { plan[i].lastIdx = idx; if (now - lastTick > 55) { lastTick = now; sfx.tick(); } }
@@ -314,7 +312,7 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
         msg.className = 'room-msg tense';
         msg.innerHTML = jackpotTense ? 'Deux 7… <b>Le jackpot est possible</b>' : `Deux ${SYMBOLS[r[0]]}… <b>un troisième ?</b>`;
         sfx.tension((durations[2] - durations[1]) / 1000);
-        setTimeout(() => teaser(jackpotTense ? VIBES.teaserJackpot : VIBES.teaserTriple), 200);
+        setTimeout(() => whisper(VIBES.whispersTense), 600);
         api.haptic([10, 80, 10, 80, 10]);
         const wr = win.getBoundingClientRect();
         tensionTimer = setInterval(() => {
@@ -326,13 +324,11 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
     }
 
     function finish() {
-      clearInterval(floatTimer);
-      room.querySelectorAll('.bn-tease').forEach((b) => b.remove());
       room.classList.remove('spinning', 'tension');
       win.classList.remove('tense');
       KEYS.forEach((key) => q(`.live-row[data-k="${key}"]`).classList.add(key === k ? 'hit' : 'miss'));
       res.msg ||= lines?.[k] ?? say(k === 'seven' ? 'slotJackpot' : k === 'triple' ? 'slotTriple' : k === 'pair' ? 'slotPair' : 'slotNothing');
-      banner(`<div class="bn-main">${chars(res.msg)}</div>${res.win ? `<div class="bn-sub">+${res.win} jetons</div>` : ''}`, `bn-res bn-${k}`, k === 'seven' ? 2600 : 1900);
+      banner(`<div class="bn-main">${chars(res.msg)}</div>${res.win ? `<div class="bn-sub">+${res.win} jetons</div>` : ''}`, `bn-res bn-${k}`, k === 'seven' ? 2800 : 2200);
       api.save();
       const pop = q('.win-pop');
       const wr = win.getBoundingClientRect();
@@ -403,7 +399,6 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
     if (closed) return;
     closed = true;
     removeEventListener('hashchange', onHash);
-    clearInterval(floatTimer);
     fx.destroy();
     room.classList.remove('open');
     document.body.classList.remove('in-room');
