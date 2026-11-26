@@ -225,9 +225,9 @@ function stepsFor(n) {
   if (d.custom) return GAMES[d.custom].steps();
   const out = [];
   if (d.kind === 'gift') out.push(openStep(n));
-  if (d.salary) out.push(gameStep('salary', d.salary, 'Le salaire', 'Sans risque : tu gagnes selon ta réussite.'));
+  if (d.salary) out.push(gameStep('salary', d.salary, 'Le jeu du cadeau', 'Sans risque : plus tu réussis, plus tu gagnes.'));
   if (d.jackpot) out.push(jackpotStep());
-  if (d.table) out.push(gameStep('table', d.table, 'La table', 'Facultatif : tu mises, le hasard décide.', true));
+  if (d.table) out.push(gameStep('table', d.table, 'La table du jour', 'Facultatif : tu mises, le hasard décide.', true));
   if (d.kind === 'case') out.push(caisseStep(n));
   if (d.kind === 'final') out.push(cashoutStep());
   return out;
@@ -572,27 +572,28 @@ export function vipCardHTML(vip) {
 
 export const RULES = [
   {
-    title: 'Le salaire',
-    html: `<p>Certains jours, un jeu parle du cadeau de ta case : un quiz, un memory, une photo à deviner…</p>
-      <p>C'est sans risque. Tu gagnes des jetons selon ta réussite, pas selon la chance.</p>`,
+    title: 'Le but du jeu',
+    html: `<p>Chaque jour, tu ouvres une case du calendrier et tu joues dans l'appli pour gagner des jetons.</p>
+      <p>Le 25 décembre, tes jetons deviennent un vrai bon pour une soirée au casino : <b>10 jetons = 1 €</b>, jusqu'à <b>50 €</b>.</p>
+      <p>Ton objectif : arriver au 25 avec le plus de jetons possible.</p>`,
   },
   {
-    title: 'La table',
-    html: `<p>Chaque jour, une table de casino. Elle est <b>facultative</b>.</p>
-      <p>Tu mises ce que tu veux, jusqu'à la moitié de ton solde. Les vraies règles, les vraies probabilités, affichées sur chaque table.</p>
-      <p>Le tirage est enregistré dès que tu valides ta mise : recharger la page ne change rien. Tout est noté dans ton relevé.</p>`,
+    title: 'Les jeux sans risque',
+    html: `<p>Les jours où ta case cache un cadeau, un petit jeu parle de lui : un quiz, un memory, une photo à deviner…</p>
+      <p>Tu ne peux rien perdre. Plus tu réussis, plus tu gagnes de jetons.</p>`,
   },
   {
-    title: 'La caisse',
-    html: `<p>Certaines cases se paient pour être ouvertes :</p>
-      <ul><li>Petite case : <b>10</b> jetons</li><li>Case moyenne : <b>25</b> jetons</li><li>Grosse case : <b>50</b> jetons</li></ul>
-      <p>Tu ne sais pas ce qu'il y a dedans. Si tu ne paies pas, la croupière garde la case.</p>`,
+    title: 'La table du jour',
+    html: `<p>Chaque jour, une table de casino t'attend : roulette, blackjack, dés…</p>
+      <p>Tu n'es pas obligé de jouer. Si tu joues, tu mises jusqu'à la moitié de tes jetons : tu peux doubler ta mise… ou la perdre.</p>
+      <p>Le hasard est vrai et les chances sont affichées. Rien n'est truqué, tout est noté dans ton relevé.</p>`,
   },
   {
-    title: 'Le 25 décembre',
-    html: `<p>Tes jetons sont convertis : <b>10 jetons = 1 €</b>, jusqu'à <b>50 €</b>. Tu reçois un bon pour une soirée au casino avec cette somme.</p>
-      <p>Chaque case achetée, c'est du budget casino en moins. À toi de choisir.</p>
-      <p class="muted">Sous 10 jetons, la croupière te fait une avance de 20 jetons, une fois par semaine.</p>`,
+    title: 'Les cases payantes',
+    html: `<p>Certains jours, ta case est fermée à clé. Pour l'ouvrir, tu passes à la caisse :</p>
+      <ul><li>petite case : <b>10</b> jetons</li><li>case moyenne : <b>25</b> jetons</li><li>grosse case : <b>50</b> jetons</li></ul>
+      <p>Tu ne sais pas ce qu'il y a dedans. Chaque jeton dépensé, c'est du casino en moins le 25. Si tu ne paies pas, la croupière garde la case.</p>
+      <p class="muted">Moins de 10 jetons ? La croupière t'en avance 20, une fois par semaine.</p>`,
   },
 ];
 
