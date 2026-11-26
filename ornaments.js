@@ -24,6 +24,7 @@ const O = {
   21: '<path class="rf" d="M26 5l2.5 5.2 5.7.8-4.1 4 1 5.6L26 18l-5.1 2.6 1-5.6-4.1-4 5.7-.8z"/><path d="M18 20L5 33M16 14L6 24M22 23L12 35"/>',
   22: '<circle cx="20" cy="17" r="12"/><path d="M11 29h18l2 6H9z"/><path d="M14.5 24l5.5-9 5.5 9z"/><path d="M20 24v2"/><circle class="f" cx="14" cy="11" r="1"/><circle class="f" cx="25" cy="9" r="1"/><circle class="f" cx="27" cy="16" r="1"/><circle class="f" cx="12" cy="18" r="1"/>',
   23: '<path d="M20 2v4"/><rect x="16.5" y="6" width="7" height="4"/><circle cx="20" cy="23" r="12"/><path class="r" d="M8.5 19.5h23M8.5 26.5h23" stroke-width="3"/><path d="M14 23h.01M20 23h.01M26 23h.01" stroke-width="2.6"/>',
+  25: '<circle cx="20" cy="20" r="16"/><circle cx="20" cy="20" r="10.5"/><path class="r" d="M20 4v5M20 31v5M4 20h5M31 20h5M8.7 8.7l3.5 3.5M27.8 27.8l3.5 3.5M31.3 8.7l-3.5 3.5M12.2 27.8l-3.5 3.5" stroke-width="3" stroke-linecap="butt"/><path class="rf" d="M20 13.5l1.9 4.3 4.6.4-3.5 3 1.1 4.6-4.1-2.5-4.1 2.5 1.1-4.6-3.5-3 4.6-.4z"/>',
   24: '<path d="M20 2v36M2 20h36M7.3 7.3l25.4 25.4M32.7 7.3L7.3 32.7" stroke-width=".9"/><path class="rf" d="M20 8l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/><circle cx="20" cy="20" r="2"/>',
 };
 

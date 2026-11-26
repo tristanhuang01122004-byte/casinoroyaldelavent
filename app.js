@@ -47,7 +47,7 @@ const dec = (d, h = 0) => new Date(CONFIG.year, 11, d, h);
 function isUnlocked(n) { return testMode || Date.now() >= dec(n).getTime(); }
 function todayNumber() {
   const now = new Date();
-  if (now.getFullYear() === CONFIG.year && now.getMonth() === 11 && now.getDate() <= 24) return now.getDate();
+  if (now.getFullYear() === CONFIG.year && now.getMonth() === 11 && now.getDate() <= 25) return now.getDate();
   return null;
 }
 function weekKey() {
@@ -373,7 +373,7 @@ function cashoutStep() {
         });
         if (!ok) return;
         S.final = { balance: S.balance, euros: eur(S.balance), at: Date.now() };
-        S.ledger.push({ t: Date.now(), day: 24, label: `Encaissement : bon de ${fmtEur(S.final.euros)}`, amount: 0, bal: S.balance });
+        S.ledger.push({ t: Date.now(), day: 25, label: `Encaissement : bon de ${fmtEur(S.final.euros)}`, amount: 0, bal: S.balance });
         haptic([30, 60, 30, 60, 80]);
         api.complete();
       };
@@ -399,7 +399,7 @@ function renderVoucher(el) {
       <div><b>${paid.toLocaleString('fr-FR')}</b><small>jetons dépensés</small></div>
       <div><b>${opened}</b><small>cases achetées</small></div>
     </div>
-    <p class="final-msg">Le casino ouvre ses portes demain…</p>`;
+    <p class="final-msg">Joyeux Noël. Le casino t'attend.</p>`;
 }
 
 /* ───────────── Vues ───────────── */
@@ -464,13 +464,13 @@ function doorHTML(n, today) {
   const unlocked = isUnlocked(n);
   const done = unlocked && dayDone(n);
   const started = unlocked && !done && S.days[n] && Object.keys(S.days[n].steps).length;
-  const cls = ['door', unlocked ? 'unlocked' : 'locked', done ? 'done' : '', n === today && !done ? 'today' : '', d.jackpot || n === 21 ? 'jackpot' : '', n === 24 ? 'final' : ''].join(' ');
+  const cls = ['door', unlocked ? 'unlocked' : 'locked', done ? 'done' : '', n === today && !done ? 'today' : '', d.jackpot || n === 21 ? 'jackpot' : '', d.kind === 'final' ? 'final' : ''].join(' ');
   let badge = '';
   if (done && d.kind === 'case') badge = S.days[n].steps.caisse?.paid ? '<i class="tag">ouverte</i>' : '<i class="tag off">laissée</i>';
   else if (done) badge = '<i class="tag">✓</i>';
   else if (started) badge = '<i class="tag live">en cours</i>';
   return `<button class="${cls}" data-n="${n}" aria-label="Jour ${n}">
-      <span class="d-num">${n}</span>
+      <span class="d-num">${d.kind === 'final' ? `${n} décembre · Encaissement` : n}</span>
       ${unlocked ? ornament(n) : `<span class="d-back" aria-hidden="true">${'♠♥♦♣'[n % 4]}</span>`}
       ${n === today && !done ? '<span class="sticker">Aujourd\'hui</span>' : ''}
       ${badge}
@@ -492,7 +492,7 @@ function renderDay(n, main) {
     </div>
     ${d.kind === 'case' && !st.caisse?.done ? `<div class="notice">La case <b>${n}</b> est payante : ne l'ouvre pas avant d'être passé à la caisse.</div>` : ''}
     <ol class="steps"></ol>
-    ${current === -1 && n !== 24 ? `<div class="day-end">${esc(say('dayEnd', CONFIG.playerName))}</div><a href="#/" class="btn gold block">Retour au calendrier</a>` : ''}`;
+    ${current === -1 && d.kind !== 'final' ? `<div class="day-end">${esc(say('dayEnd', CONFIG.playerName))}</div><a href="#/" class="btn gold block">Retour au calendrier</a>` : ''}`;
 
   const ol = $('.steps', main);
   steps.forEach((s, i) => {
@@ -507,7 +507,7 @@ function renderDay(n, main) {
       <div class="step-body"></div>`;
     ol.append(li);
     const body = $('.step-body', li);
-    if (i === current || (n === 24 && data.done) || (s.keepOpen && data.done)) {
+    if (i === current || (d.kind === 'final' && data.done) || (s.keepOpen && data.done)) {
       const api = makeApi(n, s, () => render());
       s.render(body, api);
     }
@@ -589,7 +589,7 @@ export const RULES = [
       <p>Tu ne sais pas ce qu'il y a dedans. Si tu ne paies pas, la croupière garde la case.</p>`,
   },
   {
-    title: 'Le 24 décembre',
+    title: 'Le 25 décembre',
     html: `<p>Tes jetons sont convertis : <b>10 jetons = 1 €</b>, jusqu'à <b>50 €</b>. Tu reçois un bon pour une soirée au casino avec cette somme.</p>
       <p>Chaque case achetée, c'est du budget casino en moins. À toi de choisir.</p>
       <p class="muted">Sous 10 jetons, la croupière te fait une avance de 20 jetons, une fois par semaine.</p>`,

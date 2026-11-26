@@ -578,3 +578,13 @@ body.in-room { overflow: hidden; }
 .hdr-right { display: flex; align-items: center; gap: 8px; }
 .snd { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--red); background: var(--table); color: var(--cream); font-size: 17px; line-height: 1; display: grid; place-items: center; padding: 0; }
 .snd.off { color: var(--cream-2); opacity: .55; text-decoration: line-through; }
+
+/* Carte du 25 : l'encaissement, en pleine largeur */
+.door.final { grid-column: 1 / -1; aspect-ratio: auto; min-height: 104px; }
+.door.final .d-num { font-size: 17px; padding: 4px 0 3px; }
+.door.final .orn { width: 50px; margin: 10px 0; }
+.door.final .d-back { width: 50px; margin: 10px 0; }
+.logo-txt { font-size: 18px; white-space: nowrap; }
+.logo { min-width: 0; }
+.voucher { padding-bottom: 62px; }
+.voucher::after { bottom: 10px; }
