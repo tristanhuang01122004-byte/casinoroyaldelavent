@@ -572,9 +572,14 @@ export function vipCardHTML(vip) {
 
 export const RULES = [
   {
+    title: 'Le but du jeu',
+    html: `<p>Chaque jour, tu ouvres une case du calendrier et tu joues dans l'appli pour gagner des jetons.</p>
+      <p>Le 25 décembre, tes jetons deviennent un vrai bon pour une soirée au casino.</p>
+      <p>Ton but : arriver au 25 avec un maximum de jetons.</p>`,
+  },
+  {
     title: 'Le salaire',
-    html: `<p>Ton but : avoir un maximum de jetons le 25 décembre.</p>
-      <p>Les jours où ta case cache un cadeau, tu touches un salaire : un petit jeu sur ce cadeau (un quiz, un memory, une photo à deviner…).</p>
+    html: `<p>Les jours où ta case cache un cadeau, tu touches un salaire : un petit jeu sur ce cadeau (un quiz, un memory, une photo à deviner…).</p>
       <p>Aucun risque, tu ne peux rien perdre. Plus tu réussis, plus ton salaire est gros.</p>`,
   },
   {
