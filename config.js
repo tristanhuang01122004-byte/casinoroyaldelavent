@@ -48,6 +48,6 @@ export const DAYS = {
   21: { kind: 'gift', salary: 'd21s' },          // le bonus est caché dans une étoile
   22: { kind: 'gift', salary: 'd22s', table: 'd22' },
   23: { kind: 'case', size: 'grosse',  table: 'd23' },
-  24: { kind: 'gift', table: 'd24' },
+  24: { kind: 'case', size: 'moyenne', table: 'd24' },
   25: { kind: 'final' },             // l'encaissement
 };
