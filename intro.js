@@ -35,26 +35,26 @@ const sfx = {
 const BOOK = () => [
   {
     t: 'But du jeu',
-    h: `<p>Chaque jour, ouvre une case du calendrier et joue dans l'appli pour gagner des jetons.</p>
+    h: `<p>Chaque jour, ouvre un cadeau et joue dans l'appli pour gagner des jetons.</p>
       <p>Le 25 décembre, tes jetons fixent ta mise au casino : <b>10 jetons = 1 €</b>, jusqu'à <b>50 €</b>.</p>
       <p class="goal">Arrive au 25 avec un maximum de jetons.</p>`,
   },
   {
     t: 'Matériel',
     h: `<ul class="mat">
-        <li><span class="mat-i">${ornament(7)}</span><div><b>Le calendrier</b><small>25 cases, une par jour.</small></div></li>
+        <li><span class="mat-i">${ornament(7)}</span><div><b>Tes cadeaux</b><small>Un par jour, jusqu'au 25.</small></div></li>
         <li><span class="mat-i"><i class="chip-ico"></i></span><div><b>Tes jetons</b><small>La monnaie du casino. Ton solde est en haut de l'écran.</small></div></li>
-        <li><span class="mat-i mat-s">♠</span><div><b>Ta carte VIP</b><small>Elle t'attend dans la case 1.</small></div></li>
+        <li><span class="mat-i mat-s">♠</span><div><b>Ta carte VIP</b><small>Elle t'attend avec ton cadeau n°1.</small></div></li>
         <li><span class="mat-i mat-s red">♥</span><div><b>La croupière</b><small>Elle tient la caisse. Et elle t'a à l'œil.</small></div></li>
       </ul>`,
   },
   {
     t: 'Un tour de jeu',
     h: `<ol class="flow">
-        <li><b>Ouvre ta case</b><small>Le jour J, à partir de minuit.</small></li>
-        <li><b>Le salaire</b><small>Si ta case cache un cadeau : un petit jeu sans risque.</small></li>
+        <li><b>Ton cadeau du jour</b><small>Le jour J, à partir de minuit.</small></li>
+        <li><b>Le salaire</b><small>Si ton cadeau est offert : un petit jeu sans risque.</small></li>
         <li><b>La table</b><small>Un jeu de casino. Tu mises… ou tu passes.</small></li>
-        <li><b>La caisse</b><small>Si ta case est payante : tu l'achètes ou tu la laisses.</small></li>
+        <li><b>La caisse</b><small>Si ton cadeau est payant : tu l'achètes ou tu le laisses.</small></li>
       </ol>
       <p class="muted">Un jour oublié ? Pas grave, tu peux le jouer plus tard.</p>`,
   },
@@ -65,7 +65,7 @@ const BOOK = () => [
   {
     t: 'À toi de jouer',
     h: `<p class="goal">La croupière t'attend.</p>
-      <p>Commence par la case 1 de ton calendrier.</p>
+      <p>Commence par ton cadeau n°1.</p>
       <p class="muted">Pour relire ce livret, touche « Livret de règles » sur l'accueil.</p>
       <label class="noshow"><input type="checkbox" ${introOff() ? 'checked' : ''}> Ne plus afficher au démarrage</label>`,
     last: true,

@@ -244,12 +244,12 @@ function openStep(n) {
   return {
     id: 'open',
     title: 'Le cadeau',
-    summary: () => `Case ${n} ouverte`,
+    summary: () => `Cadeau ${n} ouvert`,
     render(el, api) {
       el.innerHTML = `
         <div class="open-box">
           <div class="big-num">${ornament(n)}<span>${n}</span></div>
-          <p>Ouvre la case <b>${n}</b> de ton calendrier.</p>
+          <p>Ouvre ton cadeau n°<b>${n}</b>.</p>
         </div>
         <button class="btn gold block">C'est ouvert</button>`;
       $('button', el).onclick = () => api.complete();
@@ -316,7 +316,7 @@ function caisseStep(n) {
     summary: (data) => data.paid ? `Payée ${c.price} jetons` : 'Laissée à la croupière',
     render(el, api) {
       if (S.final) {
-        el.innerHTML = `<p>Le casino a fermé ses comptes : cette case revient à la croupière.</p>`;
+        el.innerHTML = `<p>Le casino a fermé ses comptes : ce cadeau revient à la croupière.</p>`;
         return api.complete({ paid: false, late: true }, false);
       }
       const can = S.balance >= c.price;
@@ -325,12 +325,12 @@ function caisseStep(n) {
           <div class="case-lid">${n}</div>
           <div><b>${c.label}</b><br><span class="price">${fmtTok(c.price)}</span> · ${fmtEur(c.price / CONFIG.tokensPerEuro)} de casino</div>
         </div>
-        <p class="muted">Ce qu'il y a dedans ? Mystère. Si tu paies, tu l'ouvres. Sinon, la croupière la garde.</p>
+        <p class="muted">Ce qu'il y a dedans ? Mystère. Si tu paies, tu l'ouvres. Sinon, la croupière le garde.</p>
         ${can ? '' : `<p class="warn">Il te manque ${fmtTok(c.price - S.balance)}. Tu peux revenir plus tard, ou la laisser.</p>`}
         <button class="btn gold block pay" ${can ? '' : 'disabled'}>Payer ${c.price} et ouvrir</button>
-        <button class="btn ghost block leave">Laisser la case à la croupière</button>`;
+        <button class="btn ghost block leave">Laisser le cadeau à la croupière</button>`;
       $('.pay', el).onclick = () => {
-        debit(c.price, `Jour ${n} : ${c.label.toLowerCase()} achetée`, n);
+        debit(c.price, `Jour ${n} : ${c.label.toLowerCase()} acheté`, n);
         haptic([20, 40, 20]);
         api.complete({ paid: true });
         toast(say('paid', n));
@@ -338,10 +338,10 @@ function caisseStep(n) {
       $('.leave', el).onclick = async () => {
         const ok = await modal({
           title: say('leaveTitle'),
-          body: `<p>La case ${n} sera perdue pour de bon. Tu gardes tes ${c.price} jetons pour le casino.</p>`,
+          body: `<p>Le cadeau n°${n} sera perdu pour de bon. Tu gardes tes ${c.price} jetons pour le casino.</p>`,
           actions: [{ label: 'Annuler', value: false }, { label: say('leaveOk'), value: true, kind: 'gold' }],
         });
-        if (ok) { S.ledger.push({ t: Date.now(), day: n, label: `Jour ${n} : case laissée à la croupière`, amount: 0, bal: S.balance }); api.complete({ paid: false }); }
+        if (ok) { S.ledger.push({ t: Date.now(), day: n, label: `Jour ${n} : cadeau laissé à la croupière`, amount: 0, bal: S.balance }); api.complete({ paid: false }); }
       };
     },
   };
@@ -364,7 +364,7 @@ function cashoutStep() {
           <div><span>${fmtEur(eur(S.balance))}</span><small>pour le casino</small></div>
         </div>
         <p class="muted">${CONFIG.tokensPerEuro} jetons = 1 €, plafond ${CONFIG.euroCap} €.</p>
-        ${pending.length ? `<p class="warn">Cases non réglées : ${pending.join(', ')}. Après l'encaissement, elles reviennent à la croupière.</p>` : ''}
+        ${pending.length ? `<p class="warn">Cadeaux non réglés : ${pending.join(', ')}. Après l'encaissement, ils reviennent à la croupière.</p>` : ''}
         <button class="btn gold block">Encaisser mes jetons</button>`;
       $('button', el).onclick = async () => {
         const ok = await modal({
@@ -393,7 +393,7 @@ function renderVoucher(el) {
     <div class="stats">
       <div><b>${won.toLocaleString('fr-FR')}</b><small>jetons gagnés</small></div>
       <div><b>${paid.toLocaleString('fr-FR')}</b><small>jetons dépensés</small></div>
-      <div><b>${opened}</b><small>cases achetées</small></div>
+      <div><b>${opened}</b><small>cadeaux achetés</small></div>
     </div>
     <p class="final-msg">Joyeux Noël. Le casino t'attend.</p>`;
 }
@@ -488,7 +488,7 @@ function renderDay(n, main) {
       <a href="#/" class="back" aria-label="Retour">‹</a>
       <div><div class="day-title">${n} décembre</div><div class="day-sub">${label}</div></div>
     </div>
-    ${d.kind === 'case' && !st.caisse?.done ? `<div class="notice">🔒 Ta case <b>${n}</b> est fermée à clé : elle coûte <b>${CASE_SIZES[d.size].price} jetons</b>.<br>Ne l'ouvre pas tout de suite. Joue d'abord, puis tout en bas, à la caisse, tu choisis de l'acheter… ou pas.</div>` : ''}
+    ${d.kind === 'case' && !st.caisse?.done ? `<div class="notice">🔒 Ton cadeau n°<b>${n}</b> est fermé à clé : il coûte <b>${CASE_SIZES[d.size].price} jetons</b>.<br>Ne l'ouvre pas tout de suite. Joue d'abord, puis tout en bas, à la caisse, tu choisis de l'acheter… ou pas.</div>` : ''}
     <ol class="steps"></ol>
     ${current === -1 && d.kind !== 'final' ? `<div class="day-end">${esc(say('dayEnd', CONFIG.playerName))}</div><a href="#/" class="btn gold block">Retour au calendrier</a>` : ''}`;
 
@@ -553,7 +553,7 @@ function renderCard(main) {
   main.innerHTML = `
     <div class="day-head"><a href="#/" class="back" aria-label="Retour">‹</a>
       <div><div class="day-title">Ma carte VIP</div></div></div>
-    ${S.vip ? vipCardHTML(S.vip) : '<p class="muted center">Ta carte t\'attend dans la case 1.</p>'}
+    ${S.vip ? vipCardHTML(S.vip) : '<p class="muted center">Ta carte t\'attend avec ton cadeau n°1.</p>'}
     <button class="btn gold block livret">Livret de règles</button>`;
   $('.livret', main).onclick = () => openIntro({ startAt: 4 });
 }
@@ -572,13 +572,13 @@ export function vipCardHTML(vip) {
 export const RULES = [
   {
     title: 'Le but du jeu',
-    html: `<p>Chaque jour, tu ouvres une case du calendrier et tu joues dans l'appli pour gagner des jetons.</p>
+    html: `<p>Chaque jour, tu ouvres un cadeau et tu joues dans l'appli pour gagner des jetons.</p>
       <p>Le 25 décembre, tes jetons deviennent un vrai bon pour une soirée au casino.</p>
       <p>Ton but : arriver au 25 avec un maximum de jetons.</p>`,
   },
   {
     title: 'Le salaire',
-    html: `<p>Certains jours, ta case cache un cadeau. Ces jours-là, tu touches un salaire : un petit jeu surprise, lié à ton cadeau.</p>
+    html: `<p>Certains jours, ton cadeau t\'est offert. Ces jours-là, tu touches un salaire : un petit jeu surprise, lié à ce cadeau.</p>
       <p>Aucun risque, tu ne peux rien perdre. Plus tu réussis, plus ton salaire est gros.</p>`,
   },
   {
@@ -589,14 +589,14 @@ export const RULES = [
   },
   {
     title: 'La caisse',
-    html: `<p>Certains jours, ta case est fermée à clé. Pour l'ouvrir, tu paies à la caisse :</p>
-      <ul><li>petite case : <b>10</b> jetons</li><li>case moyenne : <b>25</b> jetons</li><li>grosse case : <b>50</b> jetons</li></ul>
-      <p>Tu ne sais pas ce qu'il y a dedans. Si tu ne paies pas, la croupière garde la case.</p>`,
+    html: `<p>Certains jours, ton cadeau est fermé à clé. Pour l'ouvrir, tu le paies à la caisse :</p>
+      <ul><li>petit cadeau : <b>10</b> jetons</li><li>cadeau moyen : <b>25</b> jetons</li><li>gros cadeau : <b>50</b> jetons</li></ul>
+      <p>Tu ne sais pas ce qu'il y a dedans. Si tu ne paies pas, la croupière garde le cadeau.</p>`,
   },
   {
     title: 'Le 25 décembre',
     html: `<p>Tes jetons deviennent un vrai bon pour une soirée au casino : <b>10 jetons = 1 €</b>, jusqu'à <b>50 €</b>.</p>
-      <p>À toi de choisir : chaque case payée, c'est du casino en moins. Plus tu gardes de jetons, plus ta soirée sera belle.</p>
+      <p>À toi de choisir : chaque cadeau payé, c'est du casino en moins. Plus tu gardes de jetons, plus ta soirée sera belle.</p>
       <p class="muted">Moins de 10 jetons ? La croupière t'en avance 20, une fois par semaine.</p>`,
   },
 ];

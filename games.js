@@ -15,12 +15,12 @@ const welcome = {
     {
       id: 'open',
       title: 'La lettre',
-      summary: () => 'Case 1 ouverte',
+      summary: () => 'Cadeau 1 ouvert',
       render(el, api) {
         el.innerHTML = `
           <div class="open-box">
             <div class="big-num">${ornament(1)}<span>1</span></div>
-            <p>Ouvre la case <b>1</b> de ton calendrier.<br>Une lettre t'y attend : lis-la avant de continuer.</p>
+            <p>Ouvre ton cadeau n°<b>1</b>.<br>Une lettre t'y attend : lis-la avant de continuer.</p>
           </div>
           <button class="btn gold block">J'ai lu ma lettre</button>`;
         $('button', el).onclick = () => api.complete();

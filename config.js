@@ -18,9 +18,9 @@ export const CONFIG = {
 };
 
 export const CASE_SIZES = {
-  petite:  { label: 'Petite case',  price: 10 },
-  moyenne: { label: 'Case moyenne', price: 25 },
-  grosse:  { label: 'Grosse case',  price: 50 },
+  petite:  { label: 'Petit cadeau', price: 10 },
+  moyenne: { label: 'Cadeau moyen', price: 25 },
+  grosse:  { label: 'Gros cadeau',  price: 50 },
 };
 
 // kind: 'gift' (cadeau offert) | 'case' (case payante) | 'final' (encaissement)
