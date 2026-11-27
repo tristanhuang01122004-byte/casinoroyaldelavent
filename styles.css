@@ -803,4 +803,4 @@ body.in-intro { overflow: hidden; }
 .coin-room .call-row .lever { font-size: 19px; line-height: 1.05; padding: 4px 6px; }
 .coin-room .lever.ghost { font-size: 16px !important; }
 .coin-label { font-size: 11px; white-space: nowrap; bottom: 7%; }
-.coin-face.has-img .coin-label { display: none; }
+.coin-label { font-size: 13px; }

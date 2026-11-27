@@ -5,7 +5,8 @@ import { VIBES } from './vibes.js';
 import { sound, tone, unlockAudio, setSound, music } from './audio.js';
 import { sparks, sfx } from './slot.js';
 
-export const SIDES = { chaton: 'Chaton', pique: 'Tristan et son chaton' };
+export const SIDES = { chaton: 'Pile', pique: 'Face' };
+export const FACES = { chaton: 'Chaton', pique: 'Tristan et son chaton' };
 const MAX_WINS = 3; // ×8
 
 // Faces de la pièce : photo si elle existe (img/coin-chaton.jpg, img/coin-pique.jpg), sinon dessin.
@@ -145,7 +146,7 @@ export function openCoinRoom({ api, label, lines, onClose }) {
     const max = Math.floor(api.balance() * CONFIG.tableMaxShare);
     if (!d.state) {
       d.pick ??= Math.min(5, max);
-      msg.innerHTML = max < 1 ? 'Pas assez de jetons pour miser aujourd\'hui.' : 'Choisis ta mise, puis ton côté.';
+      msg.innerHTML = max < 1 ? 'Pas assez de jetons pour miser aujourd\'hui.' : `<b>Pile</b> = ${FACES.chaton} · <b>Face</b> = ${FACES.pique}`;
       ctrl.innerHTML = `
         <div class="bet">
           <div class="bet-row">
@@ -158,8 +159,8 @@ export function openCoinRoom({ api, label, lines, onClose }) {
           <button class="tapis">Tapis (${max})</button>
         </div>
         <div class="call-row">
-          <button class="lever call" data-s="chaton" ${d.pick < 1 ? 'disabled' : ''}>${SIDES.chaton}</button>
-          <button class="lever call" data-s="pique" ${d.pick < 1 ? 'disabled' : ''}>${SIDES.pique}</button>
+          <button class="lever call" data-s="chaton" ${d.pick < 1 ? 'disabled' : ''}>${SIDES.chaton}<small>${FACES.chaton}</small></button>
+          <button class="lever call" data-s="pique" ${d.pick < 1 ? 'disabled' : ''}>${SIDES.pique}<small>${FACES.pique}</small></button>
         </div>`;
       ctrl.querySelectorAll('.chip-btn').forEach((b) => b.onclick = () => { d.pick = Math.max(1, Math.min(max, d.pick + +b.dataset.v)); tone(1200, 0.04, { vol: 0.06 }); draw(); });
       ctrl.querySelector('.tapis').onclick = () => { d.pick = max; tone(900, 0.08, { vol: 0.08 }); draw(); };
@@ -170,8 +171,8 @@ export function openCoinRoom({ api, label, lines, onClose }) {
       ctrl.innerHTML = w ? `
         <button class="lever cash">Encaisser <small>+${pot()} jetons</small></button>
         <div class="call-row">
-          <button class="lever ghost call" data-s="chaton">${SIDES.chaton}<small>relancer pour ${pot() * 2}</small></button>
-          <button class="lever ghost call" data-s="pique">${SIDES.pique}<small>relancer pour ${pot() * 2}</small></button>
+          <button class="lever ghost call" data-s="chaton">Relancer · ${SIDES.chaton}<small>${FACES.chaton} · pour ${pot() * 2}</small></button>
+          <button class="lever ghost call" data-s="pique">Relancer · ${SIDES.pique}<small>${FACES.pique} · pour ${pot() * 2}</small></button>
         </div>` : '';
       ctrl.querySelector('.cash')?.addEventListener('click', cashOut);
       ctrl.querySelectorAll('.call').forEach((b) => b.onclick = () => flip(b.dataset.s));
