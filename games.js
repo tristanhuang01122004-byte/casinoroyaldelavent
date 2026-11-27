@@ -143,7 +143,13 @@ const d2 = {
       el.innerHTML = `
         <div class="coin-teaser">
           <div class="mini-coin"><span>♠</span></div>
-          <p class="lead">${!d.state ? 'Mise tes jetons sur <b>Pile</b> ou <b>Face</b>. <b>Pile</b>, c\'est la photo de Chaton ; <b>Face</b>, celle de Tristan et son chaton. Gagne et ta mise double… puis encaisse ou relance, jusqu\'à <b>×8</b>.'
+          <p class="lead">${!d.state ? `Mise tes jetons sur <b>Pile</b> (la photo de Chaton) ou sur <b>Face</b> (Tristan et son chaton).</p>
+              <ul class="howto">
+                <li>Tu as droit à <b>3 lancers</b> maximum.</li>
+                <li>Chaque lancer gagné double ta mise : <b>×2</b>, puis <b>×4</b>, puis <b>×8</b>. ×8, c\'est le maximum.</li>
+                <li>Après chaque lancer gagné, tu choisis : <b>encaisser</b> tes gains, ou <b>relancer</b>.</li>
+                <li>Un lancer perdu, et toute la mise est perdue.</li>
+              </ul><p class="lead" hidden>`
             : over ? (d.state === 'lost' ? `Perdu sur ta mise de ${d.bet}.` : `Encaissé : <b>+${d.cashed}</b> sur une mise de ${d.bet}.`)
             : `Partie en cours : pot de <b>${d.bet * 2 ** d.flips.filter((f) => f.win).length} jetons</b>.`}</p>
           <p class="muted">Une seule partie par jour. 50 % de chances à chaque lancer.</p>

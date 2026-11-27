@@ -488,7 +488,7 @@ function renderDay(n, main) {
       <a href="#/" class="back" aria-label="Retour">‹</a>
       <div><div class="day-title">${n} décembre</div><div class="day-sub">${label}</div></div>
     </div>
-    ${d.kind === 'case' && !st.caisse?.done ? `<div class="notice">La case <b>${n}</b> est payante : ne l'ouvre pas avant d'être passé à la caisse.</div>` : ''}
+    ${d.kind === 'case' && !st.caisse?.done ? `<div class="notice">🔒 Ta case <b>${n}</b> est fermée à clé : elle coûte <b>${CASE_SIZES[d.size].price} jetons</b>.<br>Ne l'ouvre pas tout de suite. Joue d'abord, puis tout en bas, à la caisse, tu choisis de l'acheter… ou pas.</div>` : ''}
     <ol class="steps"></ol>
     ${current === -1 && d.kind !== 'final' ? `<div class="day-end">${esc(say('dayEnd', CONFIG.playerName))}</div><a href="#/" class="btn gold block">Retour au calendrier</a>` : ''}`;
 

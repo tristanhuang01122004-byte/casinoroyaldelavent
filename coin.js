@@ -124,7 +124,7 @@ export function openCoinRoom({ api, label, lines, onClose }) {
     const w = wins();
     const lost = d.state === 'lost';
     q('.live-big').textContent = lost ? '0 %' : w >= MAX_WINS ? '100 %' : '50 %';
-    q('.live-state').textContent = lost ? 'Perdu' : w >= MAX_WINS ? 'Maximum atteint' : d.state === 'cashed' ? 'Encaissé' : w ? `Lancer n°${w + 1}` : 'Premier lancer';
+    q('.live-state').textContent = lost ? 'Perdu' : w >= MAX_WINS ? 'Maximum atteint' : d.state === 'cashed' ? 'Encaissé' : `Lancer ${w + 1} sur 3`;
     [1, 2, 3].forEach((k) => {
       const row = q(`.live-row[data-k="${k}"]`);
       const p = lost ? 0 : k <= w ? 1 : (d.state === 'cashed' ? 0 : 0.5 ** (k - w));

@@ -804,3 +804,5 @@ body.in-intro { overflow: hidden; }
 .coin-room .lever.ghost { font-size: 16px !important; }
 .coin-label { font-size: 11px; white-space: nowrap; bottom: 7%; }
 .coin-label { font-size: 13px; }
+.howto { text-align: left; margin: 0 0 8px; padding-left: 20px; font-size: 17px; }
+.howto li { margin-bottom: 4px; }
