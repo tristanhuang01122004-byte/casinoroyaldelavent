@@ -312,8 +312,11 @@ export function openSlotRoom({ api, spinsTotal, label, lines, onClose }) {
       music.intensity(0.3);
       win.classList.remove('tense');
       KEYS.forEach((key) => q(`.live-row[data-k="${key}"]`).classList.add(key === k ? 'hit' : 'miss'));
-      let line = lines?.[k];
-      if (line && typeof line === 'object') { line = d.onceUsed ? line.then : line.once; d.onceUsed = true; }
+      // Jamais deux fois la même bannière, et « boomboclat » une seule fois.
+      const used = d.spins.slice(0, -1).map((x) => x.msg).filter(Boolean);
+      const boom = (t) => /boomboclat/i.test(t);
+      const pool = (lines?.[k] || []).filter((t) => !used.includes(t) && !(boom(t) && used.some(boom)));
+      const line = pool[0];
       res.msg ||= line ?? say(k === 'seven' ? 'slotJackpot' : k === 'triple' ? 'slotTriple' : k === 'pair' ? 'slotPair' : 'slotNothing');
       api.save();
       setTimeout(() => banner(res.msg, res.win ? `+${res.win} jetons` : '', `bn-res bn-${k}`, k === 'seven' ? 3000 : 2400), k === 'seven' || k === 'triple' ? 1500 : 1100);

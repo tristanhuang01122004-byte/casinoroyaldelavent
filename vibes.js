@@ -28,12 +28,13 @@ export const VIBES = {
 
 // Phrases de résultat de la machine à sous, par jour.
 export const SLOT_LINES = {
+  // Pour chaque résultat, la liste des bannières possibles, dans l'ordre de préférence.
+  // Une bannière ne sort jamais deux fois, et « boomboclat » une seule fois sur les 3 tirages.
   1: {
-    // { once, then } : « once » ne sort qu'une seule fois sur les 3 tirages.
-    seven: { once: 'Boomboclat wallah !!', then: 'Bouzelouf wallah !!' },
-    triple: { once: 'Boomboclat wallah !!', then: 'Bouzelouf wallah !!' },
-    pair: 'Mais nan ! Bouzelouf wallah',
-    none: { once: 'Boomboclat…', then: 'Bouzelouf…' },
+    seven: ['Boomboclat wallah !!', 'JACKPOT. Wallah c\'est réel', 'La maison est en PLS'],
+    triple: ['Boomboclat wallah !!', 'Brelan ! La croupière tremble', 'Wallah t\'es chaud'],
+    pair: ['Mais nan ! Bouzelouf wallah', 'Petite paire, petit bouzelouf', 'Une paire, c\'est déjà ça'],
+    none: ['Boomboclat…', 'Bouzelouf…', 'Presque… wallah', 'La maison garde tout'],
   },
 };
 
