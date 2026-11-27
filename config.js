@@ -5,6 +5,8 @@ export const CONFIG = {
   year: 2026,
   playerName: 'Tristan',
   memberNo: 'CR-2026-0001',
+  dealerName: 'Croupichaton',   // signature de l'invitation
+  casinoDate: null,             // ex. 'samedi 10 janvier' ; null = « à fixer ensemble »
   startBonus: 50,          // bonus de bienvenue du jour 1
   jackpotBonus: 50,        // bonus des jours jackpot
   tokensPerEuro: 10,       // 10 jetons = 1 €

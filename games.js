@@ -1,7 +1,7 @@
 // Les jeux du calendrier. Chaque jeu : { title, render(el, api), summary?(data) }.
 // Le jour 1 est un déroulé sur mesure : { steps() }.
 import { CONFIG } from './config.js';
-import { vipCardHTML, RULES, rain } from './app.js';
+import { vipCardHTML, rain } from './app.js';
 import { say, SLOT_LINES } from './vibes.js';
 import { ornament } from './ornaments.js';
 import { openSlotRoom, SYMBOLS } from './slot.js';
@@ -123,30 +123,6 @@ const welcome = {
               else draw();
             } });
           };
-        };
-        draw();
-      },
-    },
-    {
-      id: 'rules',
-      title: 'Les règles',
-      summary: () => 'Lues',
-      render(el, api) {
-        let i = 0;
-        const draw = () => {
-          const r = RULES[i];
-          el.innerHTML = `
-            <div class="rule-card">
-              <div class="rule-step">${i + 1} / ${RULES.length}</div>
-              <h4>${r.title}</h4>${r.html}
-            </div>
-            <div class="dots">${RULES.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
-            <div class="row">
-              ${i > 0 ? '<button class="btn ghost prev">Retour</button>' : ''}
-              <button class="btn gold next">${i < RULES.length - 1 ? 'Suivant' : 'C\'est parti'}</button>
-            </div>`;
-          $('.prev', el)?.addEventListener('click', () => { i--; draw(); });
-          $('.next', el).onclick = () => { if (i < RULES.length - 1) { i++; draw(); } else api.complete(); };
         };
         draw();
       },

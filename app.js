@@ -4,6 +4,7 @@ import { say } from './vibes.js';
 import { startFx, burst } from './fx.js';
 import { ornament, laurel } from './ornaments.js';
 import { sound, unlockAudio, setSound, music } from './audio.js';
+import { openIntro, introOff, invitationHTML } from './intro.js';
 
 /* ───────────── Sauvegarde ───────────── */
 const KEY_REAL = 'cra_save_v1';
@@ -387,13 +388,8 @@ function renderVoucher(el) {
   const won = S.ledger.filter((l) => l.amount > 0).reduce((a, l) => a + l.amount, 0);
   const opened = Object.values(S.days).filter((d) => d.steps?.caisse?.paid).length;
   el.innerHTML = `
-    <div class="voucher">
-      <div class="v-top">♠ Casino Royal ♠</div>
-      <div class="v-title">Bon pour une soirée au casino</div>
-      <div class="v-amount">${fmtEur(f.euros)}</div>
-      <div class="v-name">au nom de ${esc(CONFIG.playerName)}</div>
-      <div class="v-foot">Membre ${CONFIG.memberNo} · émis le ${new Date(f.at).toLocaleDateString('fr-FR')}</div>
-    </div>
+    <div class="inv-final">${invitationHTML(fmtEur(f.euros))}</div>
+    <p class="muted center">Mise validée le ${new Date(f.at).toLocaleDateString('fr-FR')} · membre ${CONFIG.memberNo}</p>
     <div class="stats">
       <div><b>${won.toLocaleString('fr-FR')}</b><small>jetons gagnés</small></div>
       <div><b>${paid.toLocaleString('fr-FR')}</b><small>jetons dépensés</small></div>
@@ -431,7 +427,7 @@ function renderHome(main) {
         <div class="hero-label"><span>Les comptes sont fermés</span></div>` : `
         <div class="token-wrap">${laurel('l')}<div class="token"><div class="hero-bal">${S.balance.toLocaleString('fr-FR')}</div><small>jetons</small></div>${laurel('r')}</div>
         <div class="hero-label"><span>${say('heroLabel')}</span></div>
-        <div class="hero-sub">${fmtEur(euros)} pour le casino${S.balance >= CONFIG.euroCap * CONFIG.tokensPerEuro ? ' · plafond atteint' : ''}</div>`}
+        <div class="hero-sub">Ta mise au casino : <b>${fmtEur(euros)}</b> / ${CONFIG.euroCap} €${S.balance >= CONFIG.euroCap * CONFIG.tokensPerEuro ? ' · plafond atteint' : ''}</div>`}
     </section>
     ${!open ? `<div class="notice">${say('beforeOpen', before)}</div>` : ''}
     ${canAdvance ? `<button class="notice advance" id="adv">${say('advance', CONFIG.advance.amount)}</button>` : ''}
@@ -439,9 +435,11 @@ function renderHome(main) {
       ${Object.keys(DAYS).map(Number).map((n) => doorHTML(n, today)).join('')}
     </section>
     <nav class="links">
+      <button class="btn gold livret">Livret de règles</button>
       <a href="#/releve" class="btn ghost">Relevé de compte</a>
-      <a href="#/carte" class="btn ghost">Carte VIP & règles</a>
+      <a href="#/carte" class="btn ghost">Ma carte VIP</a>
     </nav>`;
+  $('.livret', main).onclick = () => openIntro();
 
   main.querySelectorAll('.door').forEach((d) => {
     d.onclick = () => {
@@ -554,9 +552,10 @@ function renderLedger(main) {
 function renderCard(main) {
   main.innerHTML = `
     <div class="day-head"><a href="#/" class="back" aria-label="Retour">‹</a>
-      <div><div class="day-title">Carte VIP & règles</div></div></div>
+      <div><div class="day-title">Ma carte VIP</div></div></div>
     ${S.vip ? vipCardHTML(S.vip) : '<p class="muted center">Ta carte t\'attend dans la case 1.</p>'}
-    <div class="rules-list">${RULES.map((r) => `<div class="rule"><h4>${r.title}</h4>${r.html}</div>`).join('')}</div>`;
+    <button class="btn gold block livret">Livret de règles</button>`;
+  $('.livret', main).onclick = () => openIntro({ startAt: 4 });
 }
 
 export function vipCardHTML(vip) {
@@ -623,6 +622,7 @@ export function rain(anchor, count = 14) {
 window.addEventListener('hashchange', render);
 startFx();
 render();
+if (!introOff()) openIntro();
 
 // La musique démarre au premier appui (les navigateurs l'exigent).
 music.want = 'lounge';
