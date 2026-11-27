@@ -143,7 +143,7 @@ const d2 = {
       el.innerHTML = `
         <div class="coin-teaser">
           <div class="mini-coin"><span>♠</span></div>
-          <p class="lead">${!d.state ? `Mise tes jetons sur <b>Pile</b> (la photo de Chaton) ou sur <b>Face</b> (Tristan et son chaton).</p>
+          <p class="lead">${!d.state ? `Mise tes jetons sur <b>Pile</b> ou sur <b>Face</b>.</p>
               <ul class="howto">
                 <li>Tu as droit à <b>3 lancers</b> maximum.</li>
                 <li>Chaque lancer gagné double ta mise : <b>×2</b>, puis <b>×4</b>, puis <b>×8</b>. ×8, c\'est le maximum.</li>
