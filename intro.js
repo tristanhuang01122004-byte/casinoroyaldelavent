@@ -44,8 +44,8 @@ const BOOK = () => [
     h: `<ul class="mat">
         <li><span class="mat-i">${ornament(7)}</span><div><b>Le calendrier</b><small>25 cases, une par jour.</small></div></li>
         <li><span class="mat-i"><i class="chip-ico"></i></span><div><b>Tes jetons</b><small>La monnaie du casino. Ton solde est en haut de l'écran.</small></div></li>
-        <li><span class="mat-i suit">♠</span><div><b>Ta carte VIP</b><small>Elle t'attend dans la case 1.</small></div></li>
-        <li><span class="mat-i suit red">♥</span><div><b>La croupière</b><small>Elle tient la caisse. Et elle t'a à l'œil.</small></div></li>
+        <li><span class="mat-i mat-s">♠</span><div><b>Ta carte VIP</b><small>Elle t'attend dans la case 1.</small></div></li>
+        <li><span class="mat-i mat-s red">♥</span><div><b>La croupière</b><small>Elle tient la caisse. Et elle t'a à l'œil.</small></div></li>
       </ul>`,
   },
   {

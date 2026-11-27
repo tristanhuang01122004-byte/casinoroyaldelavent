@@ -713,8 +713,8 @@ body.in-intro { overflow: hidden; }
 .mat li { display: flex; align-items: center; gap: 12px; }
 .mat-i { width: 46px; height: 46px; flex: none; display: grid; place-items: center; border: 2px solid var(--red); border-radius: 8px; }
 .mat-i .orn { width: 34px; }
-.mat-i.suit { font-size: 26px; color: var(--ink); }
-.mat-i.suit.red { color: var(--red); }
+.mat-i.mat-s { font-size: 26px; color: var(--ink); }
+.mat-i.mat-s.red { color: var(--red); }
 .mat li b { display: block; font-family: var(--sc); font-weight: 800; }
 .mat li small { font-size: 16px; color: var(--ink-2); }
 .flow { list-style: none; counter-reset: f; padding: 0; margin: 0 0 10px; display: flex; flex-direction: column; gap: 4px; }
@@ -738,3 +738,5 @@ body.in-intro { overflow: hidden; }
 .env-card { height: 88%; overflow: hidden; }
 .env.open .env-card { overflow: visible; }
 .env { margin-bottom: 10px; }
+.mat li div { min-width: 0; }
+.page { overflow: hidden; }
