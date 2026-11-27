@@ -809,3 +809,12 @@ body.in-intro { overflow: hidden; }
 /* Petit « Pile » / « Face » écrit sur la photo */
 .coin-label { bottom: 9%; padding: 0 5px; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: #fff; background: rgba(0, 0, 0, .35); border-radius: 3px; text-shadow: 0 1px 2px rgba(0, 0, 0, .6); }
 .coin-label { font-size: 9px; padding: 0 5px; bottom: 9%; letter-spacing: .06em; opacity: .9; }
+
+/* Pièce : jamais le dessin pendant le chargement, jamais une face vue de dos */
+.coin-fallback { display: none; }
+.coin-face.no-img .coin-fallback { display: grid; }
+.coin-face, .coin-face * { -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.coin-face.chaton { transform: translateZ(2px); }
+.coin-face.pique { transform: rotateX(180deg) translateZ(2px); }
+.coin[data-up="chaton"] .coin-face.pique, .coin[data-up="pique"] .coin-face.chaton { visibility: hidden; }
+.coin-face:not(.has-img):not(.no-img) { background: radial-gradient(circle at 35% 30%, #ffe9a8, #f2c14e 45%, #b8862a); }

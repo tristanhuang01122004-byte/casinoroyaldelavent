@@ -622,6 +622,7 @@ export function rain(anchor, count = 14) {
 window.addEventListener('hashchange', render);
 startFx();
 render();
+['chaton', 'pique'].forEach((x) => { new Image().src = `img/coin-${x}.jpg`; });
 if (!introOff()) openIntro();
 
 // La musique démarre au premier appui (les navigateurs l'exigent).

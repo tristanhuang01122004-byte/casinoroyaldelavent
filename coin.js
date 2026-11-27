@@ -80,6 +80,7 @@ export function openCoinRoom({ api, label, lines, onClose }) {
   ['chaton', 'pique'].forEach((s) => {
     const im = new Image();
     im.onload = () => room.querySelectorAll(`.coin-face.${s}`).forEach((f) => f.classList.add('has-img'));
+    im.onerror = () => room.querySelectorAll(`.coin-face.${s}`).forEach((f) => f.classList.add('no-img'));
     im.src = `img/coin-${s}.jpg`;
   });
 
@@ -216,6 +217,7 @@ export function openCoinRoom({ api, label, lines, onClose }) {
     const spins = 8 + api.randInt(3);
     angle = Math.ceil(angle / 360) * 360 + spins * 360 + (result === 'pique' ? 180 : 0);
     coin.style.transition = 'transform 3s cubic-bezier(.2,.75,.3,1)';
+    coin.dataset.up = '';
     coin.style.transform = `rotateX(${angle}deg)`;
     fly.classList.remove('toss'); void fly.offsetWidth; fly.classList.add('toss');
     q('.coin-shadow').classList.remove('toss'); void q('.coin-shadow').offsetWidth; q('.coin-shadow').classList.add('toss');
@@ -226,6 +228,7 @@ export function openCoinRoom({ api, label, lines, onClose }) {
   }
 
   function land(f) {
+    coin.dataset.up = f.result;
     if (closed) return;
     busy = false;
     music.intensity(0.3);
@@ -316,6 +319,7 @@ export function openCoinRoom({ api, label, lines, onClose }) {
   // Reprise après une sortie ou un rechargement.
   const last = d.flips[d.flips.length - 1];
   if (last) { angle = last.result === 'pique' ? 180 : 0; coin.style.transform = `rotateX(${angle}deg)`; }
+  coin.dataset.up = last ? last.result : 'chaton';
   draw();
   if (d.state === 'cashed' || d.state === 'lost') showEnd();
 }
