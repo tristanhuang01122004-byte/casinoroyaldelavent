@@ -33,7 +33,7 @@ const symCls = (i) => (i === 0 ? 'seven' : i === 2 || i === 3 ? 'red' : '');
 const cell = (i) => `<span class="cell ${symCls(i)}">${SYMBOLS[i]}</span>`;
 
 /* ───────────── Sons (Web Audio, sans fichier) ───────────── */
-const sfx = {
+export const sfx = {
   tick: () => tone(1400, 0.03, { vol: 0.06 }),
   stop: () => { tone(160, 0.18, { type: 'triangle', vol: 0.5, slide: 0.55 }); tone(1000, 0.05, { vol: 0.08 }); },
   lever: () => tone(90, 0.3, { type: 'sawtooth', vol: 0.18, slide: 2.4 }),
@@ -44,7 +44,7 @@ const sfx = {
 };
 
 /* ───────────── Étincelles (canvas) ───────────── */
-function sparks(canvas) {
+export function sparks(canvas) {
   const ctx = canvas.getContext('2d');
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   let parts = [], running = false;

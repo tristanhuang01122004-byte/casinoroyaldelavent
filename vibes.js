@@ -42,3 +42,10 @@ export const say = (k, ...args) => {
   const v = VIBES[k];
   return pick(typeof v === 'function' ? v(...args) : v);
 };
+
+// Phrases de la table Pile ou Face (jour 2). Jamais deux fois la même.
+export const COIN_LINES = {
+  win: ['Yeaaaah gurrrl', 'Yeaaaah gurrrl, encore !', 'GURRRL t\'es en feu'],
+  lose: ['Oh non, viens dans mes bras bébé'],
+  cash: ['Smart money, chef', 'Tu ranges les billes, respect', 'La croupière valide'],
+};

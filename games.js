@@ -2,7 +2,8 @@
 // Le jour 1 est un déroulé sur mesure : { steps() }.
 import { CONFIG } from './config.js';
 import { vipCardHTML, rain } from './app.js';
-import { say, SLOT_LINES } from './vibes.js';
+import { say, SLOT_LINES, COIN_LINES } from './vibes.js';
+import { openCoinRoom, SIDES } from './coin.js';
 import { ornament } from './ornaments.js';
 import { openSlotRoom, SYMBOLS } from './slot.js';
 
@@ -130,7 +131,35 @@ const welcome = {
   ],
 };
 
+/* ───────────── Jour 2 : Pile ou Face, quitte ou double ───────────── */
+const d2 = {
+  title: 'Pile ou Face',
+  summary: (d) => d.skipped ? 'Passé' : `${(d.cashed || 0) - d.bet >= 0 ? '+' : ''}${(d.cashed || 0) - d.bet} jetons`,
+  render(el, api) {
+    const d = api.data;
+    const draw = () => {
+      d.flips ||= [];
+      const over = d.state === 'cashed' || d.state === 'lost';
+      el.innerHTML = `
+        <div class="coin-teaser">
+          <div class="mini-coin"><span>♠</span></div>
+          <p class="lead">${!d.state ? 'Mise tes jetons sur <b>Chaton</b> ou <b>Pique</b>. Gagne et ta mise double… puis encaisse ou relance, jusqu\'à <b>×8</b>.'
+            : over ? (d.state === 'lost' ? `Perdu sur ta mise de ${d.bet}.` : `Encaissé : <b>+${d.cashed}</b> sur une mise de ${d.bet}.`)
+            : `Partie en cours : pot de <b>${d.bet * 2 ** d.flips.filter((f) => f.win).length} jetons</b>.`}</p>
+          <p class="muted">Une seule partie par jour. 50 % de chances à chaque lancer.</p>
+        </div>
+        <button class="btn gold block go">${!d.state ? 'S\'asseoir à la table' : over ? 'Continuer' : 'Retourner à la table'}</button>`;
+      el.querySelector('.go').onclick = () => {
+        if (over) return api.complete();
+        openCoinRoom({ api, label: 'Jour 2 : pile ou face', lines: COIN_LINES, onClose: (finished) => finished ? api.complete() : draw() });
+      };
+    };
+    draw();
+  },
+};
+
 export const GAMES = {
   welcome,
+  d2,
 };
 

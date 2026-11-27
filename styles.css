@@ -740,3 +740,63 @@ body.in-intro { overflow: hidden; }
 .env { margin-bottom: 10px; }
 .mat li div { min-width: 0; }
 .page { overflow: hidden; }
+
+/* ═════════════ Table Pile ou Face ═════════════ */
+.coin-teaser { text-align: center; }
+.mini-coin { width: 64px; height: 64px; margin: 4px auto 10px; border-radius: 50%; display: grid; place-items: center; background: #f2c14e; border: 4px solid #9c7316; box-shadow: inset 0 0 0 3px #ffe39a; font-size: 30px; color: #3a2400; }
+.pot-pill { font-family: var(--sc); font-weight: 700; color: #cfe8dc; }
+.pot-pill b { color: #ffe39a; font-size: 20px; }
+.coin-stage { position: relative; height: clamp(120px, calc(100dvh - 560px), 230px); display: grid; place-items: center; perspective: 900px; }
+.coin-fly { width: clamp(100px, calc(100dvh - 590px), 170px); aspect-ratio: 1; transform-style: preserve-3d; }
+.coin-fly.toss { animation: toss 3.3s cubic-bezier(.3, 0, .4, 1); }
+@keyframes toss {
+  0% { transform: translateY(0) scale(1); }
+  45% { transform: translateY(-6dvh) scale(.62); }
+  90% { transform: translateY(0) scale(1); }
+  95% { transform: translateY(-14px) scale(1); }
+  100% { transform: translateY(0) scale(1); }
+}
+.coin { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
+.coin-face {
+  position: absolute; inset: 0; border-radius: 50%; backface-visibility: hidden; overflow: hidden;
+  background: radial-gradient(circle at 35% 30%, #ffe9a8, #f2c14e 45%, #b8862a);
+  border: 6px solid #9c7316; display: grid; place-items: center;
+}
+.coin-face.pique { transform: rotateX(180deg); }
+.coin-rim { position: absolute; inset: 6px; border-radius: 50%; border: 2px dashed rgba(58, 36, 0, .45); z-index: 2; pointer-events: none; }
+.coin-img { position: absolute; inset: 10px; border-radius: 50%; background-size: cover; background-position: center; display: none; }
+.coin-face.has-img .coin-img { display: block; }
+.coin-face.has-img .coin-fallback { display: none; }
+.coin-fallback { width: 62%; color: #3a2400; display: grid; place-items: center; }
+.coin-fallback .coin-art { width: 100%; }
+.coin-fallback span { font-size: clamp(64px, 12dvh, 92px); line-height: 1; }
+.coin-label { position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); z-index: 3; font-family: var(--sc); font-weight: 900; font-size: 14px; color: #3a2400; background: rgba(255, 233, 168, .85); padding: 0 8px; border-radius: 4px; }
+.coin-shadow { position: absolute; bottom: 4px; width: 46%; height: 16px; border-radius: 50%; background: rgba(0, 0, 0, .45); filter: blur(4px); }
+.coin-shadow.toss { animation: shadowToss 3.3s cubic-bezier(.3, 0, .4, 1); }
+@keyframes shadowToss { 45% { transform: scale(.45); opacity: .35; } 90% { transform: none; opacity: 1; } }
+.room.won .coin-face { box-shadow: 0 0 40px rgba(255, 227, 154, .9); }
+
+.coin-ctrl { display: flex; flex-direction: column; gap: 8px; }
+.bet { background: rgba(0, 0, 0, .38); border: 2px solid #9c7316; border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.bet-row { display: flex; align-items: center; gap: 6px; }
+.chip-btn { width: 46px; height: 46px; flex: none; border-radius: 50%; border: 3px dashed #fff4d6; background: #8e0d19; color: #fff; font-family: var(--sc); font-weight: 900; font-size: 15px; }
+.chip-btn:active { transform: scale(.92); }
+.bet-val { flex: 1; text-align: center; line-height: 1.05; }
+.bet-val b { display: block; font-family: var(--sc); font-weight: 900; font-size: 34px; color: #ffe39a; }
+.bet-val small { font-style: italic; font-size: 14px; color: #b9cfc4; }
+.tapis { background: none; border: 1px solid #9c7316; color: #ffe39a; border-radius: 6px; padding: 4px; font-family: var(--sc); font-weight: 700; font-size: 15px; }
+.call-row { display: flex; gap: 8px; }
+.call-row .lever { flex: 1; font-size: 22px; }
+.lever.ghost { background: rgba(0, 0, 0, .35); color: #ffe39a; border-color: #9c7316; animation: none !important; font-size: 18px !important; }
+.lever.cash { background: #8ff0b4; }
+.called { text-align: center; font-size: 18px; color: #cfe8dc; padding: 18px 0; }
+.called b { font-family: var(--sc); color: #ffe39a; }
+
+.coin-room .marquee-sub { display: none; }
+.coin-room .live-row { padding: 1px 6px; }
+.coin-room .live-head { padding-bottom: 2px; }
+.coin-room .bet { padding: 6px; gap: 4px; }
+.coin-room .chip-btn { width: 42px; height: 42px; }
+.coin-room .bet-val b { font-size: 28px; }
+.coin-room .call-row .lever, .coin-room .lever.cash { min-height: 52px; }
+.coin-room .room-msg { min-height: 24px; }
