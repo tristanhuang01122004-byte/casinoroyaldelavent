@@ -578,7 +578,7 @@ export const RULES = [
   },
   {
     title: 'Le salaire',
-    html: `<p>Les jours où ta case cache un cadeau, tu touches un salaire : un petit jeu sur ce cadeau (un quiz, un memory, une photo à deviner…).</p>
+    html: `<p>Certains jours, ta case cache un cadeau. Ces jours-là, tu touches un salaire : un petit jeu surprise, lié à ton cadeau.</p>
       <p>Aucun risque, tu ne peux rien perdre. Plus tu réussis, plus ton salaire est gros.</p>`,
   },
   {
