@@ -445,7 +445,7 @@ function renderHome(main) {
     d.onclick = () => {
       const n = +d.dataset.n;
       if (!isUnlocked(n)) { haptic(8); d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake'); return toast(say('locked', n)); }
-      if (n > 1 && !dayDone(1)) return toast(say('startFirst'));
+      if (n > 1 && !testMode && !dayDone(1)) return toast(say('startFirst'));
       location.hash = `#/jour/${n}`;
     };
   });
@@ -476,7 +476,7 @@ function doorHTML(n, today) {
 }
 
 function renderDay(n, main) {
-  if (!isUnlocked(n) || (n > 1 && !dayDone(1))) { location.hash = '#/'; return; }
+  if (!isUnlocked(n) || (n > 1 && !testMode && !dayDone(1))) { location.hash = '#/'; return; }
   const d = DAYS[n];
   const steps = stepsFor(n);
   const st = dayState(n).steps;
