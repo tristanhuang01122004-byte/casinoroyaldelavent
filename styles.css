@@ -800,3 +800,7 @@ body.in-intro { overflow: hidden; }
 .coin-room .bet-val b { font-size: 28px; }
 .coin-room .call-row .lever, .coin-room .lever.cash { min-height: 52px; }
 .coin-room .room-msg { min-height: 24px; }
+.coin-room .call-row .lever { font-size: 19px; line-height: 1.05; padding: 4px 6px; }
+.coin-room .lever.ghost { font-size: 16px !important; }
+.coin-label { font-size: 11px; white-space: nowrap; bottom: 7%; }
+.coin-face.has-img .coin-label { display: none; }

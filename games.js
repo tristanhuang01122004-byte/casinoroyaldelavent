@@ -143,7 +143,7 @@ const d2 = {
       el.innerHTML = `
         <div class="coin-teaser">
           <div class="mini-coin"><span>♠</span></div>
-          <p class="lead">${!d.state ? 'Mise tes jetons sur <b>Chaton</b> ou <b>Pique</b>. Gagne et ta mise double… puis encaisse ou relance, jusqu\'à <b>×8</b>.'
+          <p class="lead">${!d.state ? 'Mise tes jetons sur <b>Chaton</b> ou sur <b>Tristan et son chaton</b>. Gagne et ta mise double… puis encaisse ou relance, jusqu\'à <b>×8</b>.'
             : over ? (d.state === 'lost' ? `Perdu sur ta mise de ${d.bet}.` : `Encaissé : <b>+${d.cashed}</b> sur une mise de ${d.bet}.`)
             : `Partie en cours : pot de <b>${d.bet * 2 ** d.flips.filter((f) => f.win).length} jetons</b>.`}</p>
           <p class="muted">Une seule partie par jour. 50 % de chances à chaque lancer.</p>

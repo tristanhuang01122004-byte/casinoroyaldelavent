@@ -1,6 +1,6 @@
 // Réseau d'abord (les mises à jour arrivent tout de suite), cache en secours hors ligne.
-const CACHE = 'cra-v25';
-const SHELL = ['./', './index.html', './styles.css', './app.js', './games.js', './config.js', './vibes.js', './fx.js', './ornaments.js', './slot.js', './audio.js', './intro.js', './coin.js',
+const CACHE = 'cra-v27';
+const SHELL = ['./', './index.html', './styles.css', './app.js', './games.js', './config.js', './vibes.js', './fx.js', './ornaments.js', './slot.js', './audio.js', './intro.js', './coin.js', './img/coin-chaton.jpg', './img/coin-pique.jpg',
   './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
