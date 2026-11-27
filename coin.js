@@ -145,8 +145,16 @@ export function openCoinRoom({ api, label, lines, onClose }) {
   function draw() {
     showOdds();
     const max = Math.floor(api.balance() * CONFIG.tableMaxShare);
-    if (!d.state) {
-      d.pick ??= Math.min(5, max);
+    if (!d.state && max < 1) {
+      // Pas assez de jetons : aucune mise possible.
+      d.pick = 0;
+      msg.innerHTML = 'Pas assez de jetons pour miser aujourd\'hui.';
+      ctrl.innerHTML = `${api.isTest() ? '<button class="lever test-add">+100 jetons (test)</button>' : ''}
+        <button class="lever ghost end">Sortir de la table</button>`;
+      ctrl.querySelector('.test-add')?.addEventListener('click', () => { api.credit(100, 'Test : jetons ajoutés'); api.refresh(); draw(); });
+      ctrl.querySelector('.end').onclick = () => close();
+    } else if (!d.state) {
+      d.pick = Math.max(1, Math.min(max, d.pick || 5));
       msg.innerHTML = max < 1 ? 'Pas assez de jetons pour miser aujourd\'hui.' : 'Choisis ta mise, puis Pile ou Face.';
       ctrl.innerHTML = `
         <div class="bet">
@@ -163,7 +171,7 @@ export function openCoinRoom({ api, label, lines, onClose }) {
           <button class="lever call" data-s="chaton" ${d.pick < 1 ? 'disabled' : ''}>${SIDES.chaton}</button>
           <button class="lever call" data-s="pique" ${d.pick < 1 ? 'disabled' : ''}>${SIDES.pique}</button>
         </div>`;
-      ctrl.querySelectorAll('.chip-btn').forEach((b) => b.onclick = () => { d.pick = Math.max(1, Math.min(max, d.pick + +b.dataset.v)); tone(1200, 0.04, { vol: 0.06 }); draw(); });
+      ctrl.querySelectorAll('.chip-btn').forEach((b) => b.onclick = () => { d.pick = Math.min(max, Math.max(1, d.pick + +b.dataset.v)); tone(1200, 0.04, { vol: 0.06 }); draw(); });
       ctrl.querySelector('.tapis').onclick = () => { d.pick = max; tone(900, 0.08, { vol: 0.08 }); draw(); };
       ctrl.querySelectorAll('.call').forEach((b) => b.onclick = () => { unlockAudio(); start(b.dataset.s); });
     } else if (d.state === 'playing' && !busy) {
@@ -186,6 +194,7 @@ export function openCoinRoom({ api, label, lines, onClose }) {
   function start(call) {
     if (busy || d.state) return;
     const max = Math.floor(api.balance() * CONFIG.tableMaxShare);
+    if (max < 1) return draw();
     const bet = Math.max(1, Math.min(max, d.pick));
     d.bet = bet;
     d.state = 'playing';

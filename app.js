@@ -17,7 +17,12 @@ let S = load();
 function safeGet(store, k) { try { return store.getItem(k); } catch { return null; } }
 function safeSet(store, k, v) { try { store.setItem(k, v); return true; } catch { return false; } }
 function key() { return testMode ? KEY_TEST : KEY_REAL; }
-function fresh() { return { v: 1, balance: 0, ledger: [], vip: null, days: {}, advances: [], final: null }; }
+function fresh() {
+  const s = { v: 1, balance: 0, ledger: [], vip: null, days: {}, advances: [], final: null };
+  // En mode croupière, la sauvegarde de test démarre avec des jetons pour pouvoir miser partout.
+  if (testMode) { s.balance = 200; s.ledger.push({ t: Date.now(), day: null, label: 'Test : jetons de départ', amount: 200, bal: 200 }); }
+  return s;
+}
 function load() {
   try { const s = JSON.parse(safeGet(localStorage, key())); if (s && s.v === 1) return s; } catch {}
   return fresh();
@@ -519,6 +524,7 @@ function makeApi(n, step, rerender) {
   const data = (st[step.id] ||= {});
   return {
     n,
+    isTest: () => testMode,
     data,
     save: () => save(),
     rand, randInt, credit, debit, haptic, toast, modal, esc, fmtTok,
